@@ -1,8 +1,8 @@
 package main
 
 import (
-	"githab/mrflick72/go-playground/src/adapter"
-	"githab/mrflick72/go-playground/src/web"
+	"githab/mrflick72/cloud-native-todo-list/todo-service/src/adapter"
+	"githab/mrflick72/cloud-native-todo-list/todo-service/src/web"
 	"github.com/labstack/echo"
 )
 

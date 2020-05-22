@@ -3,7 +3,7 @@ package adapter
 import (
 	"database/sql"
 	"fmt"
-	"githab/mrflick72/go-playground/src/model"
+	"githab/mrflick72/cloud-native-todo-list/todo-service/src/model"
 	_ "github.com/go-sql-driver/mysql"
 	"time"
 )

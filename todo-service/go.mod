@@ -1,4 +1,4 @@
-module githab/mrflick72/go-playground
+module githab/mrflick72/cloud-native-todo-list/todo-service
 
 go 1.14
 
