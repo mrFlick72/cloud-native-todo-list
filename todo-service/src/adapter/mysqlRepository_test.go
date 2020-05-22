@@ -1,6 +1,7 @@
 package adapter
 
 import (
+	sql "database/sql"
 	"fmt"
 	"githab/mrflick72/go-playground/src/model"
 	"github.com/google/uuid"
@@ -24,6 +25,7 @@ func TestMySqlTodoRepository_SaveTodo(t *testing.T) {
 	if err != nil {
 		t.Error("some errors occurs during the insert query")
 	}
+	clearDatabase()
 }
 
 func TestMySqlTodoRepository_GetTodo(t *testing.T) {
@@ -53,6 +55,7 @@ func TestMySqlTodoRepository_GetTodo(t *testing.T) {
 		t.Error("the retrieved todo is not wat we expect")
 
 	}
+	clearDatabase()
 }
 
 func TestMySqlTodoRepository_GetAllTodo(t *testing.T) {
@@ -94,4 +97,51 @@ func TestMySqlTodoRepository_GetAllTodo(t *testing.T) {
 		t.Error("actual: ", actual[1])
 		t.Error("the retrieved todo is not wat we expect")
 	}
+	clearDatabase()
+}
+
+func TestMySqlTodoRepository_RemoveTodo(t *testing.T) {
+
+	random, _ := uuid.NewRandom()
+	aTodo := model.Todo{
+		Id:       random.String(),
+		Content:  "it is a todo",
+		UserName: "my user name",
+		Date:     model.Now(),
+	}
+
+	random, _ = uuid.NewRandom()
+	anotherTodo := model.Todo{
+		Id:       random.String(),
+		Content:  "it is a todo",
+		UserName: "my user name",
+		Date:     model.Now(),
+	}
+	repository.SaveTodo(&aTodo)
+	repository.SaveTodo(&anotherTodo)
+
+	expected := []model.Todo{aTodo}
+
+	sort.Slice(expected, func(p, q int) bool {
+		return expected[p].Id < expected[q].Id
+	})
+
+	repository.RemoveTodo(anotherTodo.Id)
+	actual, err := repository.GetAllTodo()
+
+	if err != nil {
+		t.Error("some errors occurs during the select query")
+	}
+
+	if expected[0] != *actual[0] {
+		t.Error("expected: ", expected[0])
+		t.Error("actual: ", actual[0])
+		t.Error("the retrieved todo is not wat we expect")
+	}
+	clearDatabase()
+}
+
+func clearDatabase() {
+	open, _ := sql.Open("mysql", repository.ConnectionString)
+	open.Query("DROP TABLE  TODO")
 }
