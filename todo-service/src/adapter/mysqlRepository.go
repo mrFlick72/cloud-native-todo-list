@@ -18,7 +18,7 @@ func (repository *MySqlTodoRepository) GetAllTodo() ([]*model.Todo, error) {
 	database, err := openConnectionFor(repository)
 	errorLog(err)
 
-	query, _ := database.Prepare("SELECT id, content FROM TODO")
+	query, _ := database.Prepare("SELECT id, user_name as username, date, content FROM TODO")
 	rows, err := query.Query()
 	errorLog(err)
 

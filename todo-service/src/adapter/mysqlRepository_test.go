@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"githab/mrflick72/go-playground/src/model"
 	"github.com/google/uuid"
+	"sort"
 	"testing"
 )
 
@@ -51,5 +52,46 @@ func TestMySqlTodoRepository_GetTodo(t *testing.T) {
 		fmt.Println("actual ", actual)
 		t.Error("the retrieved todo is not wat we expect")
 
+	}
+}
+
+func TestMySqlTodoRepository_GetAllTodo(t *testing.T) {
+	random, _ := uuid.NewRandom()
+	aTodo := model.Todo{
+		Id:       random.String(),
+		Content:  "it is a todo",
+		UserName: "my user name",
+		Date:     model.Now(),
+	}
+
+	random, _ = uuid.NewRandom()
+	anotherTodo := model.Todo{
+		Id:       random.String(),
+		Content:  "it is a todo",
+		UserName: "my user name",
+		Date:     model.Now(),
+	}
+	repository.SaveTodo(&aTodo)
+	repository.SaveTodo(&anotherTodo)
+
+	expected := []model.Todo{aTodo, anotherTodo}
+	sort.Slice(expected, func(p, q int) bool {
+		return expected[p].Id < expected[q].Id
+	})
+	actual, err := repository.GetAllTodo()
+
+	if err != nil {
+		t.Error("some errors occurs during the select query")
+	}
+
+	if expected[0] != *actual[0] {
+		t.Error("expected: ", expected[0])
+		t.Error("actual: ", actual[0])
+		t.Error("the retrieved todo is not wat we expect")
+	}
+	if expected[1] != *actual[1] {
+		t.Error("expected: ", expected[1])
+		t.Error("actual: ", actual[1])
+		t.Error("the retrieved todo is not wat we expect")
 	}
 }
