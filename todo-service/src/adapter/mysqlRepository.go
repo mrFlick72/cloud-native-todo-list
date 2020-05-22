@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"githab/mrflick72/go-playground/src/model"
 	_ "github.com/go-sql-driver/mysql"
+	"time"
 )
 
 type MySqlTodoRepository struct {
@@ -28,13 +29,13 @@ func (repository *MySqlTodoRepository) GetAllTodo() ([]*model.Todo, error) {
 	return result, err
 }
 
-func (repository *MySqlTodoRepository) GetTodo(id int64) (*model.Todo, error) {
+func (repository *MySqlTodoRepository) GetTodo(id string) (*model.Todo, error) {
 	var result []*model.Todo
 
 	database, err := openConnectionFor(repository)
 	errorLog(err)
 
-	query, _ := database.Prepare("SELECT id, content FROM TODO WHERE ID=?")
+	query, _ := database.Prepare("SELECT id, user_name as username, date, content FROM TODO WHERE ID=?")
 	rows, err := query.Query(id)
 	errorLog(err)
 
@@ -49,8 +50,8 @@ func (repository *MySqlTodoRepository) SaveTodo(todo *model.Todo) error {
 	database, err := openConnectionFor(repository)
 	errorLog(err)
 
-	query, _ := database.Prepare("INSERT into TODO (id, content) VALUES (?, ?)")
-	rows, err := query.Query(todo.Id, todo.Content)
+	query, _ := database.Prepare("INSERT into TODO (id, user_name, date, content) VALUES (?, ?, ?, ?)")
+	rows, err := query.Query(todo.Id, todo.UserName, todo.Date, todo.Content)
 	errorLog(err)
 
 	closeResources(rows, query, database)
@@ -58,7 +59,7 @@ func (repository *MySqlTodoRepository) SaveTodo(todo *model.Todo) error {
 	return err
 }
 
-func (repository *MySqlTodoRepository) RemoveTodo(id int64) error {
+func (repository *MySqlTodoRepository) RemoveTodo(id string) error {
 	database, err := openConnectionFor(repository)
 	errorLog(err)
 
@@ -83,17 +84,21 @@ func closeResources(rows *sql.Rows, query *sql.Stmt, database *sql.DB) {
 
 func buildTodos(rows *sql.Rows, result []*model.Todo) []*model.Todo {
 	for rows.Next() {
-		var id int64
-		var content string
-		rows.Scan(&id, &content)
-		todo := model.Todo{Id: id, Content: content}
-		result = append(result, &todo)
+		var id, content, username string
+		var date time.Time
+		rows.Scan(&id, &username, &date, &content)
+		result = append(result, &model.Todo{
+			Id:       id,
+			UserName: username,
+			Date:     date,
+			Content:  content,
+		})
 	}
 	return result
 }
 
 func errorLog(err error) {
 	if err != nil {
-		fmt.Println(err, "\n")
+		fmt.Println(err)
 	}
 }

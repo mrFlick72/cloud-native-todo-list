@@ -4,14 +4,14 @@ import "time"
 
 type Todo struct {
 	Id       string
-	Todo     string
 	UserName string
 	Date     time.Time
+	Content  string
 }
 
 type TodoRepository interface {
 	GetAllTodo() ([]*Todo, error)
-	GetTodo(id int64) (*Todo, error)
+	GetTodo(id string) (*Todo, error)
 	SaveTodo(todo *Todo) error
-	RemoveTodo(id int64) error
+	RemoveTodo(id string) error
 }
