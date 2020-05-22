@@ -6,7 +6,9 @@ POST http://localhost:8000/todo
 Content-Type: application/json
 
 {
-  "id":5,
+  "id":"id",
+  "date": "2020-05-05",
+  "userName": "valerio.vaudi",
   "content": "a content for a new example"
 }
 ###

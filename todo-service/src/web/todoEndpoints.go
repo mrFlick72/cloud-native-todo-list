@@ -1,6 +1,5 @@
 package web
 
-/*
 import (
 	"githab/mrflick72/go-playground/src/model"
 	"github.com/labstack/echo"
@@ -43,4 +42,4 @@ func Endpoints(server *echo.Echo, todoRepository model.TodoRepository) {
 		return c.NoContent(http.StatusNoContent)
 	})
 
-}*/
+}

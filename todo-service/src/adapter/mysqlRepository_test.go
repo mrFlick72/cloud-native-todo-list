@@ -143,5 +143,5 @@ func TestMySqlTodoRepository_RemoveTodo(t *testing.T) {
 
 func clearDatabase() {
 	open, _ := sql.Open("mysql", repository.ConnectionString)
-	open.Query("DROP TABLE  TODO")
+	open.Exec("truncate table TODO")
 }

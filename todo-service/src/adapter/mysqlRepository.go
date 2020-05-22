@@ -100,5 +100,6 @@ func buildTodos(rows *sql.Rows, result []*model.Todo) []*model.Todo {
 func errorLog(err error) {
 	if err != nil {
 		fmt.Println(err)
+		panic(err.Error())
 	}
 }
