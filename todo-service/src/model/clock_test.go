@@ -14,3 +14,15 @@ func TestParseDateFor(t *testing.T) {
 		t.Error("parsing not valid")
 	}
 }
+
+func TestFormatDateFor(t *testing.T) {
+
+	dateFor := ParseDateFor("2050-01-01")
+
+	formattedDate := FormatDateFor(dateFor)
+
+	if formattedDate != "2050-01-01" {
+		t.Error("actual formatted date does not match with the expected one")
+	}
+
+}
