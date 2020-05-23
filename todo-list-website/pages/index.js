@@ -39,7 +39,7 @@ export default function Index() {
     const [todoList, setTodoList] = useState([])
 
     const fetchTodoListForToDay = () => {
-        readAllTodoFor(new Date().getMilliseconds())
+        readAllTodoFor(new Date().getTime())
             .then(value => {
                 let rows = value.map(value => {
                     value.id = value.id
