@@ -7,10 +7,10 @@ import (
 )
 
 type todoRepresentation struct {
-	Id       string
-	UserName string
-	Date     string
-	Content  string
+	Id       string `json:"id"`
+	UserName string `json:"userName"`
+	Date     string `json:"date"`
+	Content  string `json:"content"`
 }
 type TodoEndpoints struct {
 	TodoRepository model.TodoRepository

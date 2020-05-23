@@ -42,7 +42,8 @@ export default function Index() {
         readAllTodoFor(new Date().getMilliseconds())
             .then(value => {
                 let rows = value.map(value => {
-                    value.todo = value.content
+                    value.id = value.id
+                    value.content = value.content
                     value.delete = getDeleteLinkFor(value.id)
                     return value
                 })
