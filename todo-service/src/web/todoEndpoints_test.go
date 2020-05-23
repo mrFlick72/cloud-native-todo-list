@@ -2,7 +2,6 @@ package web
 
 import (
 	"encoding/json"
-	"fmt"
 	"githab/mrflick72/cloud-native-todo-list/todo-service/src/adapter"
 	"githab/mrflick72/cloud-native-todo-list/todo-service/src/model"
 	"github.com/labstack/echo"
@@ -32,6 +31,39 @@ func TestGetAllTodo(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 	assert.Equal(t, string(expected), actual)
+}
+func TestGetAllTodoWhenTodoIsEmpty(t *testing.T) {
+	repository := adapter.InMemoryTodoRepository{}
+	e := echo.New()
+
+	req := httptest.NewRequest(http.MethodGet, "/todo", nil)
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+	c.SetPath("/todo")
+
+	endpoint := TodoEndpoints{TodoRepository: &repository}
+	endpoint.GetTodoEndpoint(c)
+
+	expected, _ := json.Marshal([]todoRepresentation{})
+	actual := strings.Trim(rec.Body.String(), "\n")
+
+	assert.Equal(t, http.StatusOK, rec.Code)
+	assert.Equal(t, string(expected), actual)
+}
+func TestGetAllTodoWhenRepositoryGoesInError(t *testing.T) {
+	e := echo.New()
+
+	req := httptest.NewRequest(http.MethodGet, "/todo", nil)
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+	c.SetPath("/todo")
+
+	endpoint := TodoEndpoints{TodoRepository: nil}
+	endpoint.GetTodoEndpoint(c)
+
+	assert.Equal(t, http.StatusInternalServerError, rec.Code)
 }
 
 func TestGetOneTodo(t *testing.T) {
@@ -103,7 +135,6 @@ func TestTodoEndpoints_DeleteTodoEndpoint(t *testing.T) {
 
 func initDatabase(repository *adapter.InMemoryTodoRepository) {
 	repository.SaveTodo(aNewTodo())
-	fmt.Println("save a todo")
 }
 
 func aNewTodo() *model.Todo {

@@ -3,6 +3,7 @@ package web
 import (
 	"githab/mrflick72/cloud-native-todo-list/todo-service/src/model"
 	"github.com/labstack/echo"
+	"log"
 	"net/http"
 )
 
@@ -17,18 +18,21 @@ type TodoEndpoints struct {
 }
 
 func (endpoints *TodoEndpoints) GetTodoEndpoint(c echo.Context) error {
-	allTodo, _ := endpoints.TodoRepository.GetAllTodo()
-	var todoRepresentation []todoRepresentation
-	for _, todo := range allTodo {
-		todoRepresentation = append(todoRepresentation, fromDomainToRepresentation(todo))
-	}
-	return c.JSON(http.StatusOK, &todoRepresentation)
+	allTodo, err := endpoints.TodoRepository.GetAllTodo()
+	err = manageErrorFor(err, c)
+
+	todoRepresentation := fromDomainToRepresentationForAllTodoInList(allTodo)
+	err = c.JSON(http.StatusOK, &todoRepresentation)
+	return err
 }
 
 func (endpoints *TodoEndpoints) GetOneTodoEndpoint(c echo.Context) error {
 	id := c.Param("id")
-	todo, _ := endpoints.TodoRepository.GetTodo(id)
-	return c.JSON(http.StatusOK, fromDomainToRepresentation(todo))
+	todo, err := endpoints.TodoRepository.GetTodo(id)
+	err = manageErrorFor(err, c)
+
+	err = c.JSON(http.StatusOK, fromDomainToRepresentation(todo))
+	return err
 }
 
 func (endpoints *TodoEndpoints) SaveTodoEndpoint(c echo.Context) error {
@@ -53,6 +57,19 @@ func (endpoints *TodoEndpoints) DeleteTodoEndpoint(c echo.Context) error {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 	return c.NoContent(http.StatusNoContent)
+}
+
+func manageErrorFor(err error, c echo.Context) error {
+	log.Fatal(err)
+	return c.NoContent(http.StatusInternalServerError)
+}
+
+func fromDomainToRepresentationForAllTodoInList(allTodo []*model.Todo) []todoRepresentation {
+	todoRepresentation := []todoRepresentation{}
+	for _, todo := range allTodo {
+		todoRepresentation = append(todoRepresentation, fromDomainToRepresentation(todo))
+	}
+	return todoRepresentation
 }
 
 func fromDomainToRepresentation(todo *model.Todo) todoRepresentation {
