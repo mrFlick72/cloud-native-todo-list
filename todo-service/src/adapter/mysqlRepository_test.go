@@ -3,7 +3,7 @@ package adapter
 import (
 	sql "database/sql"
 	"fmt"
-	"githab/mrflick72/go-playground/src/model"
+	"githab/mrflick72/cloud-native-todo-list/todo-service/src/model"
 	"github.com/google/uuid"
 	"sort"
 	"testing"
@@ -14,109 +14,53 @@ var (
 )
 
 func TestMySqlTodoRepository_SaveTodo(t *testing.T) {
-	random, _ := uuid.NewRandom()
-	err := repository.SaveTodo(&model.Todo{
-		Id:       random.String(),
-		Content:  "it is a todo",
-		UserName: "my user name",
-		Date:     model.Now(),
-	})
+	todo := aNewTodo()
 
-	if err != nil {
-		t.Error("some errors occurs during the insert query")
-	}
+	err := repository.SaveTodo(&todo)
+
+	assertThatNoErrorFor(t, err, "some errors occurs during the insert query")
 	clearDatabase()
 }
 
 func TestMySqlTodoRepository_GetTodo(t *testing.T) {
-	random, _ := uuid.NewRandom()
-
-	expected := model.Todo{
-		Id:       random.String(),
-		Content:  "it is a todo",
-		UserName: "my user name",
-		Date:     model.Now(),
-	}
+	expected := aNewTodo()
 	err := repository.SaveTodo(&expected)
+	assertThatNoErrorFor(t, err, "some errors occurs during the insert query")
 
-	if err != nil {
-		t.Error("some errors occurs during the insert query")
-	}
-
-	actual, err := repository.GetTodo(random.String())
-
-	if err != nil {
-		t.Error("some errors occurs during the find one query")
-	}
+	actual, err := repository.GetTodo(expected.Id)
+	assertThatNoErrorFor(t, err, "some errors occurs during the find one query")
 
 	if expected != *actual {
 		fmt.Println("expected ", expected)
 		fmt.Println("actual ", actual)
 		t.Error("the retrieved todo is not wat we expect")
-
 	}
+
 	clearDatabase()
 }
 
 func TestMySqlTodoRepository_GetAllTodo(t *testing.T) {
-	random, _ := uuid.NewRandom()
-	aTodo := model.Todo{
-		Id:       random.String(),
-		Content:  "it is a todo",
-		UserName: "my user name",
-		Date:     model.Now(),
-	}
+	aTodo := aNewTodo()
+	anotherTodo := aNewTodo()
 
-	random, _ = uuid.NewRandom()
-	anotherTodo := model.Todo{
-		Id:       random.String(),
-		Content:  "it is a todo",
-		UserName: "my user name",
-		Date:     model.Now(),
-	}
 	repository.SaveTodo(&aTodo)
 	repository.SaveTodo(&anotherTodo)
 
-	expected := []model.Todo{aTodo, anotherTodo}
-	sort.Slice(expected, func(p, q int) bool {
-		return expected[p].Id < expected[q].Id
-	})
+	expected := orderedTodoListById(aTodo, anotherTodo)
+
 	actual, err := repository.GetAllTodo()
+	assertThatNoErrorFor(t, err, "some errors occurs during the select query")
 
-	if err != nil {
-		t.Error("some errors occurs during the select query")
-	}
+	assertEqualityFor(t, expected[0], actual[0])
+	assertEqualityFor(t, expected[1], actual[1])
 
-	if expected[0] != *actual[0] {
-		t.Error("expected: ", expected[0])
-		t.Error("actual: ", actual[0])
-		t.Error("the retrieved todo is not wat we expect")
-	}
-	if expected[1] != *actual[1] {
-		t.Error("expected: ", expected[1])
-		t.Error("actual: ", actual[1])
-		t.Error("the retrieved todo is not wat we expect")
-	}
 	clearDatabase()
 }
 
 func TestMySqlTodoRepository_RemoveTodo(t *testing.T) {
+	aTodo := aNewTodo()
+	anotherTodo := aNewTodo()
 
-	random, _ := uuid.NewRandom()
-	aTodo := model.Todo{
-		Id:       random.String(),
-		Content:  "it is a todo",
-		UserName: "my user name",
-		Date:     model.Now(),
-	}
-
-	random, _ = uuid.NewRandom()
-	anotherTodo := model.Todo{
-		Id:       random.String(),
-		Content:  "it is a todo",
-		UserName: "my user name",
-		Date:     model.Now(),
-	}
 	repository.SaveTodo(&aTodo)
 	repository.SaveTodo(&anotherTodo)
 
@@ -128,20 +72,44 @@ func TestMySqlTodoRepository_RemoveTodo(t *testing.T) {
 
 	repository.RemoveTodo(anotherTodo.Id)
 	actual, err := repository.GetAllTodo()
+	assertThatNoErrorFor(t, err, "some errors occurs during the select query")
 
-	if err != nil {
-		t.Error("some errors occurs during the select query")
-	}
+	assertEqualityFor(t, expected[0], actual[0])
+	clearDatabase()
+}
 
-	if expected[0] != *actual[0] {
-		t.Error("expected: ", expected[0])
-		t.Error("actual: ", actual[0])
+func assertEqualityFor(t *testing.T, expected model.Todo, actual *model.Todo) {
+	if expected != *actual {
+		t.Error("expected: ", expected)
+		t.Error("actual: ", actual)
 		t.Error("the retrieved todo is not wat we expect")
 	}
-	clearDatabase()
 }
 
 func clearDatabase() {
 	open, _ := sql.Open("mysql", repository.ConnectionString)
 	open.Exec("truncate table TODO")
+}
+
+func assertThatNoErrorFor(t *testing.T, err error, errorMessage string) {
+	if err != nil {
+		t.Error(errorMessage)
+	}
+}
+
+func aNewTodo() model.Todo {
+	random, _ := uuid.NewRandom()
+	return model.Todo{
+		Id:       random.String(),
+		Content:  "it is a todo",
+		UserName: "my user name",
+		Date:     model.Now(),
+	}
+}
+func orderedTodoListById(aTodo model.Todo, anotherTodo model.Todo) []model.Todo {
+	expected := []model.Todo{aTodo, anotherTodo}
+	sort.Slice(expected, func(p, q int) bool {
+		return expected[p].Id < expected[q].Id
+	})
+	return expected
 }
