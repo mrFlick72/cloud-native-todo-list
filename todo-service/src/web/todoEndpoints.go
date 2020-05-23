@@ -13,17 +13,28 @@ type todoRepresentation struct {
 	Date     string
 	Content  string
 }
+type TodoEndpoints struct {
+	TodoRepository model.TodoRepository
+}
 
-func Endpoints(server *echo.Echo, todoRepository model.TodoRepository) {
-	server.GET("/todo", func(c echo.Context) error {
-		allTodo, _ := todoRepository.GetAllTodo()
-		todoRepresentation := []todoRepresentation{}
-		for _, todo := range allTodo {
-			fmt.Println(todo)
-			todoRepresentation = append(todoRepresentation, fromDomainToRepresentation(todo))
-		}
-		return c.JSON(http.StatusOK, &todoRepresentation)
-	})
+func (endpoints *TodoEndpoints) GetTodoEndpoint(c echo.Context) error {
+	fmt.Println("allTodo: ")
+	allTodo, _ := endpoints.TodoRepository.GetAllTodo()
+	todoRepresentation := []todoRepresentation{}
+	for _, todo := range allTodo {
+		fmt.Println(todo)
+		todoRepresentation = append(todoRepresentation, fromDomainToRepresentation(todo))
+	}
+	return c.JSON(http.StatusOK, &todoRepresentation)
+}
+
+func (endpoints *TodoEndpoints) GetOneTodoEndpoint(c echo.Context) error {
+	id := c.Param("id")
+	todo, _ := endpoints.TodoRepository.GetTodo(id)
+	return c.JSON(http.StatusOK, fromDomainToRepresentation(todo))
+}
+
+func EndpointsContainer(server *echo.Echo, todoRepository model.TodoRepository) {
 
 	server.GET("/todo/:id", func(c echo.Context) error {
 		id := c.Param("id")
