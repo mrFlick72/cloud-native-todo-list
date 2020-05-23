@@ -1,7 +1,6 @@
 package web
 
 import (
-	"fmt"
 	"githab/mrflick72/cloud-native-todo-list/todo-service/src/model"
 	"github.com/labstack/echo"
 	"net/http"
@@ -18,12 +17,9 @@ type TodoEndpoints struct {
 }
 
 func (endpoints *TodoEndpoints) GetTodoEndpoint(c echo.Context) error {
-	fmt.Println("allTodo: ")
-	repository := endpoints.TodoRepository
-	allTodo, _ := repository.GetAllTodo()
-	todoRepresentation := []todoRepresentation{}
+	allTodo, _ := endpoints.TodoRepository.GetAllTodo()
+	var todoRepresentation []todoRepresentation
 	for _, todo := range allTodo {
-		fmt.Println(todo)
 		todoRepresentation = append(todoRepresentation, fromDomainToRepresentation(todo))
 	}
 	return c.JSON(http.StatusOK, &todoRepresentation)
@@ -31,42 +27,32 @@ func (endpoints *TodoEndpoints) GetTodoEndpoint(c echo.Context) error {
 
 func (endpoints *TodoEndpoints) GetOneTodoEndpoint(c echo.Context) error {
 	id := c.Param("id")
-	repository := endpoints.TodoRepository
-	todo, _ := repository.GetTodo(id)
+	todo, _ := endpoints.TodoRepository.GetTodo(id)
 	return c.JSON(http.StatusOK, fromDomainToRepresentation(todo))
 }
 
-func EndpointsContainer(server *echo.Echo, todoRepository model.TodoRepository) {
+func (endpoints *TodoEndpoints) SaveTodoEndpoint(c echo.Context) error {
+	todoRepresentation := new(todoRepresentation)
+	if err := c.Bind(todoRepresentation); err != nil {
+		return err
+	}
 
-	server.POST("/todo", func(c echo.Context) error {
-		todo := new(todoRepresentation)
-		if err := c.Bind(todo); err != nil {
-			return err
-		}
+	err := endpoints.TodoRepository.SaveTodo(fromRepresentationToDomain(todoRepresentation))
 
-		err := todoRepository.SaveTodo(&model.Todo{
-			Id:       todo.Id,
-			UserName: todo.UserName,
-			Date:     model.ParseDateFor(todo.Date),
-			Content:  todo.Content,
-		})
+	if err != nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
+	return c.NoContent(http.StatusCreated)
+}
 
-		if err != nil {
-			return c.NoContent(http.StatusInternalServerError)
-		}
-		return c.NoContent(http.StatusCreated)
-	})
+func (endpoints *TodoEndpoints) DeleteTodoEndpoint(c echo.Context) error {
+	id := c.Param("id")
+	err := endpoints.TodoRepository.RemoveTodo(id)
 
-	server.DELETE("/todo/:id", func(c echo.Context) error {
-		id := c.Param("id")
-		err := todoRepository.RemoveTodo(id)
-
-		if err != nil {
-			return c.NoContent(http.StatusInternalServerError)
-		}
-		return c.NoContent(http.StatusNoContent)
-	})
-
+	if err != nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
+	return c.NoContent(http.StatusNoContent)
 }
 
 func fromDomainToRepresentation(todo *model.Todo) todoRepresentation {
@@ -75,5 +61,13 @@ func fromDomainToRepresentation(todo *model.Todo) todoRepresentation {
 		UserName: todo.UserName,
 		Date:     model.FormatDateFor(todo.Date),
 		Content:  todo.Content,
+	}
+}
+func fromRepresentationToDomain(representation *todoRepresentation) *model.Todo {
+	return &model.Todo{
+		Id:       representation.Id,
+		UserName: representation.UserName,
+		Date:     model.ParseDateFor(representation.Date),
+		Content:  representation.Content,
 	}
 }

@@ -10,9 +10,11 @@ func main() {
 	repository := adapter.MySqlTodoRepository{ConnectionString: "root:root@tcp(localhost)/todo?parseTime=true"}
 	server := echo.New()
 	endpoint := web.TodoEndpoints{TodoRepository: &repository}
+
 	server.GET("/todo", endpoint.GetTodoEndpoint)
 	server.GET("/todo/:id", endpoint.GetTodoEndpoint)
-	web.EndpointsContainer(server, &repository)
+	server.GET("/todo", endpoint.SaveTodoEndpoint)
+	server.GET("/todo/:id", endpoint.DeleteTodoEndpoint)
 
 	server.Start(":8000")
 }
