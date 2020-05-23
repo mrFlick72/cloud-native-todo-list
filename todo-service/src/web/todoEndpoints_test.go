@@ -14,8 +14,8 @@ import (
 )
 
 func TestGetAllTodo(t *testing.T) {
-	var repository model.TodoRepository = &adapter.InMemoryTodoRepository{}
-	repository.SaveTodo(aNewTodo())
+	repository := adapter.InMemoryTodoRepository{}
+	initDatabase(&repository)
 	e := echo.New()
 
 	req := httptest.NewRequest(http.MethodGet, "/todo", nil)
@@ -26,7 +26,7 @@ func TestGetAllTodo(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.SetPath("/todo")
 
-	endpoint := TodoEndpoints{TodoRepository: repository}
+	endpoint := TodoEndpoints{TodoRepository: &repository}
 	endpoint.GetTodoEndpoint(c)
 
 	expected, _ := json.Marshal([]todoRepresentation{fromDomainToRepresentation(aNewTodo())})
@@ -37,8 +37,8 @@ func TestGetAllTodo(t *testing.T) {
 }
 
 func TestGetOneTodo(t *testing.T) {
-	var repository model.TodoRepository = &adapter.InMemoryTodoRepository{}
-	repository.SaveTodo(aNewTodo())
+	repository := &adapter.InMemoryTodoRepository{}
+	initDatabase(repository)
 	e := echo.New()
 
 	req := httptest.NewRequest(http.MethodGet, "/todo/1", nil)
@@ -62,6 +62,7 @@ func TestGetOneTodo(t *testing.T) {
 }
 
 func initDatabase(repository *adapter.InMemoryTodoRepository) {
+	repository.SaveTodo(aNewTodo())
 	fmt.Println("save a todo")
 }
 

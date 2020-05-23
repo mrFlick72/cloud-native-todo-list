@@ -19,7 +19,8 @@ type TodoEndpoints struct {
 
 func (endpoints *TodoEndpoints) GetTodoEndpoint(c echo.Context) error {
 	fmt.Println("allTodo: ")
-	allTodo, _ := endpoints.TodoRepository.GetAllTodo()
+	repository := endpoints.TodoRepository
+	allTodo, _ := repository.GetAllTodo()
 	todoRepresentation := []todoRepresentation{}
 	for _, todo := range allTodo {
 		fmt.Println(todo)
@@ -30,17 +31,12 @@ func (endpoints *TodoEndpoints) GetTodoEndpoint(c echo.Context) error {
 
 func (endpoints *TodoEndpoints) GetOneTodoEndpoint(c echo.Context) error {
 	id := c.Param("id")
-	todo, _ := endpoints.TodoRepository.GetTodo(id)
+	repository := endpoints.TodoRepository
+	todo, _ := repository.GetTodo(id)
 	return c.JSON(http.StatusOK, fromDomainToRepresentation(todo))
 }
 
 func EndpointsContainer(server *echo.Echo, todoRepository model.TodoRepository) {
-
-	server.GET("/todo/:id", func(c echo.Context) error {
-		id := c.Param("id")
-		todo, _ := todoRepository.GetTodo(id)
-		return c.JSON(http.StatusOK, fromDomainToRepresentation(todo))
-	})
 
 	server.POST("/todo", func(c echo.Context) error {
 		todo := new(todoRepresentation)
