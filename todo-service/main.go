@@ -12,9 +12,9 @@ func main() {
 	endpoint := web.TodoEndpoints{TodoRepository: &repository}
 
 	server.GET("/todo", endpoint.GetTodoEndpoint)
-	server.GET("/todo/:id", endpoint.GetTodoEndpoint)
-	server.GET("/todo", endpoint.SaveTodoEndpoint)
-	server.GET("/todo/:id", endpoint.DeleteTodoEndpoint)
+	server.GET("/todo/:id", endpoint.GetOneTodoEndpoint)
+	server.POST("/todo", endpoint.SaveTodoEndpoint)
+	server.DELETE("/todo/:id", endpoint.DeleteTodoEndpoint)
 
 	server.Start(":8000")
 }

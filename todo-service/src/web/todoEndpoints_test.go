@@ -21,8 +21,6 @@ func TestGetAllTodo(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/todo", nil)
 	rec := httptest.NewRecorder()
 
-	e.NewContext(req, rec)
-
 	c := e.NewContext(req, rec)
 	c.SetPath("/todo")
 
@@ -44,8 +42,6 @@ func TestGetOneTodo(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/todo/1", nil)
 	rec := httptest.NewRecorder()
 
-	e.NewContext(req, rec)
-
 	c := e.NewContext(req, rec)
 	c.SetPath("/todo/:id")
 	c.SetParamNames("id")
@@ -59,6 +55,50 @@ func TestGetOneTodo(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 	assert.Equal(t, string(expected), actual)
+}
+
+func TestTodoEndpoints_SaveTodoEndpoint(t *testing.T) {
+	repository := adapter.InMemoryTodoRepository{}
+	initDatabase(&repository)
+	e := echo.New()
+
+	body, _ := json.Marshal(fromDomainToRepresentation(aNewTodo()))
+
+	req := httptest.NewRequest(http.MethodPost, "/todo", strings.NewReader(string(body)))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+	c.SetPath("/todo/:id")
+	c.SetParamNames("id")
+	c.SetParamValues("1")
+
+	endpoint := TodoEndpoints{TodoRepository: &repository}
+	endpoint.DeleteTodoEndpoint(c)
+
+	assert.Equal(t, http.StatusNoContent, rec.Code)
+}
+
+func TestTodoEndpoints_DeleteTodoEndpoint(t *testing.T) {
+	repository := adapter.InMemoryTodoRepository{}
+	initDatabase(&repository)
+	e := echo.New()
+
+	body, _ := json.Marshal(fromDomainToRepresentation(aNewTodo()))
+
+	req := httptest.NewRequest(http.MethodPost, "/todo", strings.NewReader(string(body)))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+	c.SetPath("/todo")
+
+	endpoint := TodoEndpoints{TodoRepository: &repository}
+	endpoint.SaveTodoEndpoint(c)
+
+	assert.Equal(t, http.StatusCreated, rec.Code)
 }
 
 func initDatabase(repository *adapter.InMemoryTodoRepository) {
