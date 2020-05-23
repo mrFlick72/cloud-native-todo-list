@@ -1,108 +1,68 @@
-import React from 'react';
-import HeaderRow from "../component/HeaderRow";
-import NewTodoItem from "../component/NewTodoItem";
-import TodoItemList from "../component/TodoItemList";
-import UpdateTodoItemPopUp from "../component/UpdateTodoItemPopUp";
-import TodoRepository from "../domain/repository/TodoRepository";
-import NewTodoUseCase from "../domain/usecase/DeleteTodoUseCase";
-import UpdateTodoUseCase from "../domain/usecase/UpdateTodoUseCase";
-import DeleteTodoUseCase from "../domain/usecase/DeleteTodoUseCase";
+import React from "react";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
+import Typography from "@material-ui/core/Typography";
+import makeStyles from "@material-ui/core/styles/makeStyles";
+import Paper from "@material-ui/core/Paper";
+import CardActions from "@material-ui/core/CardActions";
+import Button from "@material-ui/core/Button";
+import {Container} from "@material-ui/core";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import IconButton from "@material-ui/core/IconButton";
+import MenuItem from "@material-ui/core/MenuItem";
+import MenuIcon from '@material-ui/icons/Menu';
+import {AddCircle} from "@material-ui/icons";
 
-export default class Index extends React.Component {
+const useStyles = makeStyles({
+    root: {
+        flexGrow: 1,
+        minWidth: 275,
+    },
+    bullet: {
+        display: 'inline-block',
+        margin: '0 2px',
+        transform: 'scale(0.8)',
+    },
+    title: {
+        fontSize: 14,
+    },
+    pos: {
+        marginBottom: 12,
+    },
+});
 
-    constructor(props) {
-        super(props);
-        this.todoRepository = new TodoRepository();
-        this.state = {todoItems: []};
-        this.newTodoInputRef = React.createRef();
-        this.updateTodoInputRef = React.createRef();
-        this.updatePopupId = "updatePopupId";
+export default function Index() {
+    const classes = useStyles();
 
-        this.newTodoUseCase = new NewTodoUseCase(this.todoRepository,
-            value => {
-                this.setState((prevState) => ({todoItems: [...prevState.todoItems, value]}))
-            });
+    return (
+        <div className={classes.root}>
+            <Container maxWidth="sm">
 
-        this.updateTodoUseCase = new UpdateTodoUseCase(this.todoRepository, (todoId, todoTextValue) => {
-            this.setState((prevState) => ({
-                todoItems: prevState.todoItems.map(todoItem => {
-                    if (todoItem.id === todoId) {
-                        todoItem.todo = todoTextValue;
-                    }
+                <AppBar position="static">
+                    <Toolbar variant="dense">
+                        <IconButton className={classes.menuButton} aria-label="menu">
+                            <MenuIcon/>
+                        </IconButton>
+                        <div dir="rtl">
+                            <MenuItem>
+                                <AddCircle fontSize="large"/>
+                            </MenuItem>
+                        </div>
+                    </Toolbar>
+                </AppBar>
 
-                    return todoItem;
-                })
-            }));
-            $("#" + this.updatePopupId).modal("hide")
-        });
+                <Paper elevation={3}>
+                    <Card className={classes.root} variant="outlined">
+                        <CardContent>
+                            <Typography className={classes.title} color="textSecondary" gutterBottom>
+                                Todo list
+                            </Typography>
+                        </CardContent>
 
-        this.deleteTodoUseCase = new DeleteTodoUseCase(this.todoRepository, (todoId) => {
-            this.setState((prevState) => ({
-                todoItems: prevState.todoItems.filter(todoItem => todoItem.id !== todoId)
-            }))
-        });
-
-
-        this.deleteTodoItem = this.deleteTodoItem.bind(this);
-        this.newTodoInputOnClickHandler = this.newTodoInputOnClickHandler.bind(this);
-        this.updateTodoItem = this.updateTodoItem.bind(this);
-        this.openUpdatePopUpTodoItem = this.openUpdatePopUpTodoItem.bind(this);
-    }
-
-    componentDidMount() {
-        this.todoRepository.readAll(new Date().getTime()).then(response => {
-            this.setState({todoItems: response})
-        });
-    }
-
-    newTodoInputOnClickHandler() {
-        this.newTodoUseCase.newTodo(this.newTodoInputRef.current.value);
-    };
-
-    deleteTodoItem(todoId) {
-        this.deleteTodoUseCase.deleteTodo(todoId);
-    }
-
-    openUpdatePopUpTodoItem(popupId, todoId, prevTodoText) {
-        this.setState({updateItemId: todoId});
-        this.updateTodoInputRef.current.value = prevTodoText;
-        $("#" + this.updatePopupId).modal("show")
-    }
-
-    updateTodoItem() {
-        this.updateTodoUseCase.updateTodo(this.state.updateItemId, this.updateTodoInputRef.current.value);
-    }
-
-    render() {
-        return (
-            <div className="container">
-                <HeaderRow title="Todo List App"/>
-
-                <div className="row">
-                    <div className="col-12">
-                        <NewTodoItem buttonText="Insert todo"
-                                     newTodoInputRef={this.newTodoInputRef}
-                                     newTodoInputOnClickHandler={this.newTodoInputOnClickHandler}/>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col-12">
-                        <hr/>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col-12">
-                        <TodoItemList deleteTodoItem={this.deleteTodoItem}
-                                      openUpdatePopUpTodoItem={this.openUpdatePopUpTodoItem}
-                                      openUpdatePopUpId={this.updatePopupId}
-                                      todoItems={this.state.todoItems}/>
-                    </div>
-                </div>
-
-                <UpdateTodoItemPopUp updateTodoInputRef={this.updateTodoInputRef}
-                                     updateTodoItem={this.updateTodoItem}
-                                     modalId={this.updatePopupId}/>
-            </div>
-        )
-    }
+                    </Card>
+                </Paper>
+            </Container>
+        </div>
+    );
 }
