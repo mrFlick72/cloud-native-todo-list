@@ -3,7 +3,6 @@ package web
 import (
 	"githab/mrflick72/cloud-native-todo-list/todo-service/src/model"
 	"github.com/labstack/echo"
-	"log"
 	"net/http"
 )
 
@@ -60,8 +59,10 @@ func (endpoints *TodoEndpoints) DeleteTodoEndpoint(c echo.Context) error {
 }
 
 func manageErrorFor(err error, c echo.Context) error {
-	log.Fatal(err)
-	return c.NoContent(http.StatusInternalServerError)
+	if err != nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
+	return nil
 }
 
 func fromDomainToRepresentationForAllTodoInList(allTodo []*model.Todo) []todoRepresentation {

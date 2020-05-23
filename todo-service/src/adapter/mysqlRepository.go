@@ -13,7 +13,7 @@ type MySqlTodoRepository struct {
 }
 
 func (repository *MySqlTodoRepository) GetAllTodo() ([]*model.Todo, error) {
-	var result []*model.Todo
+	result := []*model.Todo{}
 
 	database, err := openConnectionFor(repository)
 	errorLog(err)
@@ -23,7 +23,6 @@ func (repository *MySqlTodoRepository) GetAllTodo() ([]*model.Todo, error) {
 	errorLog(err)
 
 	result = buildTodos(rows, result)
-
 	closeResources(rows, query, database)
 
 	return result, err

@@ -18,8 +18,10 @@ func main() {
 	server.DELETE("/todo/:id", endpoint.DeleteTodoEndpoint)
 
 	server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:8000"},
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{"GET", "POST", "DELETE"},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 	}))
+
 	server.Start(":8000")
 }
