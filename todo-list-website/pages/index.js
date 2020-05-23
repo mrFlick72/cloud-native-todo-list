@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
@@ -12,7 +12,9 @@ import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
 import MenuItem from "@material-ui/core/MenuItem";
 import MenuIcon from '@material-ui/icons/Menu';
-import {AddCircle} from "@material-ui/icons";
+import {AddCircle, Delete} from "@material-ui/icons";
+import TodoListTale from "../component/TodoListTable";
+import {deleteTodoFor, readAllTodoFor} from "../domain/repository/TodoRepository";
 
 const useStyles = makeStyles({
     root: {
@@ -34,7 +36,34 @@ const useStyles = makeStyles({
 
 export default function Index() {
     const classes = useStyles();
+    const [todoList, setTodoList] = useState([])
 
+    const fetchTodoListForToDay = () => {
+        readAllTodoFor(new Date())
+            .then(value => {
+                let rows = value.map(value => {
+                    value.todo = value.content
+                    value.delete = getDeleteLinkFor(value.id)
+                    return value
+                })
+                setTodoList(rows)
+            })
+    }
+
+    const getDeleteLinkFor = (todoId) => {
+        return <Delete onClick={() => {
+            deleteTodoFor(todoId)
+                .then(response => {
+                    if (response.status === 204) {
+                        fetchTodoListForToDay();
+                    }
+                })
+        }}/>;
+    }
+
+    useEffect(() => {
+        fetchTodoListForToDay();
+    }, [])
     return (
         <div className={classes.root}>
             <Container maxWidth="sm">
@@ -58,6 +87,7 @@ export default function Index() {
                             <Typography className={classes.title} color="textSecondary" gutterBottom>
                                 Todo list
                             </Typography>
+                            <TodoListTale todoList={todoList}/>
                         </CardContent>
 
                     </Card>
