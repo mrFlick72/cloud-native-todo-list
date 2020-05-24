@@ -10,7 +10,7 @@ import {insertTodoFor} from "../domain/repository/TodoRepository";
 import {v4 as uuidv4} from 'uuid';
 import moment from "moment";
 
-export default function NewTodoItem({onClose}) {
+export default function NewTodoItem({open, onClose, onSave}) {
     const [content, setContent] = useState("")
 
     return (
@@ -28,15 +28,26 @@ export default function NewTodoItem({onClose}) {
                 <Divider/>
 
                 <DialogActions>
-                    <Button label="Save" onClick={() => {
-                        insertTodoFor({
-                            id: uuidv4(),
-                            userName: "",
-                            date: moment().format('YYYY-MM-DD'),
-                            content: content
-                        }).then(value => onClose())
-                    }}/>
-                    <Button label="Close" onClickHandler={onClose}/>
+                    <Button color="primary"
+                            variant="outlined"
+                            onClick={() => {
+                                insertTodoFor({
+                                    id: uuidv4(),
+                                    userName: "",
+                                    date: moment().format('YYYY-MM-DD'),
+                                    content: content
+                                }).then(_ => {
+                                    onSave()
+                                    onClose()
+                                })
+                            }}>
+                        Save
+                    </Button>
+                    <Button color="primary"
+                            variant="outlined"
+                            onClick={onClose}>
+                        Close
+                    </Button>
                 </DialogActions>
             </DialogContent>
         </Dialog>)

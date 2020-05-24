@@ -13,6 +13,7 @@ import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
 import TodoListTale from "../component/TodoListTable";
+import NewTodoItem from "../component/NewTodoItem";
 
 const useStyles = makeStyles({
     root: {
@@ -34,6 +35,9 @@ const useStyles = makeStyles({
 
 export default function TodoListPage() {
     const classes = useStyles();
+    const [open, setOpen] = useState(false)
+    const handleClose = () => setOpen(false)
+    const handleOpen = () => setOpen(true)
     const [todoList, setTodoList] = useState([])
 
     const fetchTodoListForToDay = () => {
@@ -45,6 +49,7 @@ export default function TodoListPage() {
                     value.delete = getDeleteLinkFor(value.id)
                     return value
                 })
+                setTodoList(rows)
             })
     }
 
@@ -65,6 +70,8 @@ export default function TodoListPage() {
 
     return (
         <div className={classes.root}>
+            <NewTodoItem open={open} onClose={handleClose} onSave={fetchTodoListForToDay}/>
+
             <Container maxWidth="sm">
 
                 <AppBar position="static">
@@ -73,7 +80,7 @@ export default function TodoListPage() {
                             <MenuIcon/>
                         </IconButton>
                         <div dir="rtl">
-                            <MenuItem>
+                            <MenuItem onClick={handleOpen}>
                                 <AddCircle fontSize="large"/>
                             </MenuItem>
                         </div>
