@@ -6,7 +6,47 @@ POST http://localhost:8000/todo
 Content-Type: application/json
 
 {
-  "id":"id",
+  "id":"1",
+  "date": "2020-05-05",
+  "userName": "valerio.vaudi",
+  "content": "a content for a new example"
+}
+###
+POST http://localhost:8000/todo
+Content-Type: application/json
+
+{
+  "id":"2",
+  "date": "2020-05-05",
+  "userName": "valerio.vaudi",
+  "content": "a content for a new example"
+}
+###
+POST http://localhost:8000/todo
+Content-Type: application/json
+
+{
+  "id":"3",
+  "date": "2020-05-05",
+  "userName": "valerio.vaudi",
+  "content": "a content for a new example"
+}
+###
+POST http://localhost:8000/todo
+Content-Type: application/json
+
+{
+  "id":"4",
+  "date": "2020-05-05",
+  "userName": "valerio.vaudi",
+  "content": "a content for a new example"
+}
+###
+POST http://localhost:8000/todo
+Content-Type: application/json
+
+{
+  "id":"5",
   "date": "2020-05-05",
   "userName": "valerio.vaudi",
   "content": "a content for a new example"

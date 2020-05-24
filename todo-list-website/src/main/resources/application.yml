@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: todolist-website
+server:
+  servlet:
+    context-path: /website
+  port: 3000

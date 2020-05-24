@@ -1,20 +1,18 @@
-import React, {useEffect, useState} from "react";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
-import Typography from "@material-ui/core/Typography";
 import makeStyles from "@material-ui/core/styles/makeStyles";
-import Paper from "@material-ui/core/Paper";
-import CardActions from "@material-ui/core/CardActions";
-import Button from "@material-ui/core/Button";
+import React, {useEffect, useState} from "react";
+import {deleteTodoFor, readAllTodoFor} from "../domain/repository/TodoRepository";
+import {AddCircle, Delete} from "@material-ui/icons";
 import {Container} from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
+import MenuIcon from "@material-ui/icons/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
-import MenuIcon from '@material-ui/icons/Menu';
-import {AddCircle, Delete} from "@material-ui/icons";
+import Paper from "@material-ui/core/Paper";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
+import Typography from "@material-ui/core/Typography";
 import TodoListTale from "../component/TodoListTable";
-import {deleteTodoFor, readAllTodoFor} from "../domain/repository/TodoRepository";
 
 const useStyles = makeStyles({
     root: {
@@ -34,7 +32,7 @@ const useStyles = makeStyles({
     },
 });
 
-export default function Index() {
+export default function TodoListPage() {
     const classes = useStyles();
     const [todoList, setTodoList] = useState([])
 
@@ -47,7 +45,6 @@ export default function Index() {
                     value.delete = getDeleteLinkFor(value.id)
                     return value
                 })
-                setTodoList(rows)
             })
     }
 
@@ -55,7 +52,7 @@ export default function Index() {
         return <Delete onClick={() => {
             deleteTodoFor(todoId)
                 .then(response => {
-                    if (response.status === 204) {
+                    if (response) {
                         fetchTodoListForToDay();
                     }
                 })
@@ -65,6 +62,7 @@ export default function Index() {
     useEffect(() => {
         fetchTodoListForToDay();
     }, [])
+
     return (
         <div className={classes.root}>
             <Container maxWidth="sm">
