@@ -22,7 +22,7 @@ export default function TodoListTale({todoList}) {
                         <TableCell component="th" scope="row">
                             {todo.content}
                         </TableCell>
-                        <TableCell align="right">{todo.delete}</TableCell>
+                        <TableCell align="left">{todo.delete}</TableCell>
                     </TableRow>
                 ))}
             </TableBody>
