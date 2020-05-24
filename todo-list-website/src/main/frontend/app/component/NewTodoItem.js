@@ -1,10 +1,43 @@
-import React from 'react';
+import React, {useState} from 'react';
+import DialogActions from "@material-ui/core/DialogActions";
+import Divider from "@material-ui/core/Divider";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import Button from "@material-ui/core/Button";
+import Dialog from "@material-ui/core/Dialog";
+import {insertTodoFor} from "../domain/repository/TodoRepository";
+import {v4 as uuidv4} from 'uuid';
+import moment from "moment";
 
-export default ({newTodoInputRef, newTodoInputOnClickHandler, buttonText}) => {
-    return (<div className="input-group mb-3">
-        <textarea className="form-control" ref={newTodoInputRef}/>
-        <div className="input-group-append">
-            <span className="input-group-text" onClick={newTodoInputOnClickHandler}> {buttonText}</span>
-        </div>
-    </div>)
+export default function NewTodoItem({onClose}) {
+    const [content, setContent] = useState("")
+
+    return (
+        <Dialog onClose={onClose} aria-labelledby="simple-dialog-title" open={open} maxWidth="lg">
+            <DialogTitle id="simple-dialog-title">New Todo </DialogTitle>
+            <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                    <b> Put hear the your new todo</b>
+                </DialogContentText>
+
+                <textarea id="todoArea" onChange={(value) => {
+                    setContent(value.target.value)
+                }}/>
+
+                <Divider/>
+
+                <DialogActions>
+                    <Button label="Save" onClick={() => {
+                        insertTodoFor({
+                            id: uuidv4(),
+                            userName: "",
+                            date: moment().format('YYYY-MM-DD'),
+                            content: content
+                        }).then(value => onClose())
+                    }}/>
+                    <Button label="Close" onClickHandler={onClose}/>
+                </DialogActions>
+            </DialogContent>
+        </Dialog>)
 }
