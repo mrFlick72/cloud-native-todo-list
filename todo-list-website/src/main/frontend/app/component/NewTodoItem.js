@@ -18,10 +18,6 @@ export default function NewTodoItem({open, onClose, onSave}) {
         <Dialog onClose={onClose} aria-labelledby="simple-dialog-title" open={open} maxWidth="lg">
             <DialogTitle id="simple-dialog-title">New Todo </DialogTitle>
             <DialogContent>
-                <DialogContentText id="alert-dialog-description">
-                    <b> Put hear the your new todo</b>
-                </DialogContentText>
-
                 <TextField id="todoArea"
                            variant="outlined"
                            placeholder="Put here your daily todo"
