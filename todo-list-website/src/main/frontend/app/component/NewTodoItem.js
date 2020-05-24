@@ -9,6 +9,7 @@ import Dialog from "@material-ui/core/Dialog";
 import {insertTodoFor} from "../domain/repository/TodoRepository";
 import {v4 as uuidv4} from 'uuid';
 import moment from "moment";
+import TextField from "@material-ui/core/TextField";
 
 export default function NewTodoItem({open, onClose, onSave}) {
     const [content, setContent] = useState("")
@@ -21,9 +22,15 @@ export default function NewTodoItem({open, onClose, onSave}) {
                     <b> Put hear the your new todo</b>
                 </DialogContentText>
 
-                <textarea id="todoArea" onChange={(value) => {
-                    setContent(value.target.value)
-                }}/>
+                <TextField id="todoArea"
+                           variant="outlined"
+                           placeholder="Put here your daily todo"
+                           multiline
+                           rows={4}
+                           onChange={(value) => {
+                               setContent(value.target.value)
+                           }}
+                />
 
                 <Divider/>
 
