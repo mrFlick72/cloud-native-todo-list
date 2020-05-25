@@ -1,6 +1,27 @@
 spring:
   application:
     name: todolist-website
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: application
+            client-secret: "7c7b6b80-de6a-40f2-a694-5563d547ae9a"
+            clientName: Keycloak
+            authorization-grant-type: authorization_code
+            redirect-uri: http://localhost:3000/website/login/oauth2/code/keycloack
+            scope:
+              - openid
+              - profile
+              - email
+        provider:
+          keycloak:
+            authorization-uri: "http://localhost:8080/auth/realms/todo-list/protocol/openid-connect/auth"
+            token-uri: "http://localhost:8080/auth/realms/todo-list/protocol/openid-connect/token"
+            user-info-uri: "http://localhost:8080/auth/realms/todo-list/protocol/openid-connect/userinfo"
+            jwk-set-uri: "http://localhost:8080/auth/realms/todo-list/protocol/openid-connect/certs"
+            user-name-attribute: preferred_username
 server:
   servlet:
     context-path: /website
