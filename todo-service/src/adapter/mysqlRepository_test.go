@@ -22,6 +22,21 @@ func TestMySqlTodoRepository_SaveTodo(t *testing.T) {
 	clearDatabase()
 }
 
+func TestMySqlTodoRepository_GetTodoByDate(t *testing.T) {
+	expected := aNewTodo()
+	err := repository.SaveTodo(&expected)
+	assertThatNoErrorFor(t, err, "some errors occurs during the insert query")
+
+	today := model.FormatDateFor(model.ToDay())
+	fmt.Println("today is: ", today)
+	actual, err := repository.GetAllTodoByDate(today)
+	assertThatNoErrorFor(t, err, "some errors occurs during the find one query")
+
+	assertEqualityFor(t, expected, actual[0])
+
+	clearDatabase()
+}
+
 func TestMySqlTodoRepository_GetTodo(t *testing.T) {
 	expected := aNewTodo()
 	err := repository.SaveTodo(&expected)
@@ -103,7 +118,7 @@ func aNewTodo() model.Todo {
 		Id:       random.String(),
 		Content:  "it is a todo",
 		UserName: "my user name",
-		Date:     model.Now(),
+		Date:     model.ToDay(),
 	}
 }
 func orderedTodoListById(aTodo model.Todo, anotherTodo model.Todo) []model.Todo {

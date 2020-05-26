@@ -28,6 +28,23 @@ func (repository *MySqlTodoRepository) GetAllTodo() ([]*model.Todo, error) {
 	return result, err
 }
 
+func (repository *MySqlTodoRepository) GetAllTodoByDate(date string) ([]*model.Todo, error) {
+	var result []*model.Todo
+
+	database, err := openConnectionFor(repository)
+	errorLog(err)
+
+	query, _ := database.Prepare("SELECT id, user_name as username, date, content FROM TODO WHERE date=?")
+	rows, err := query.Query(model.ParseDateFor(date))
+	errorLog(err)
+
+	result = buildTodos(rows, result)
+
+	closeResources(rows, query, database)
+
+	return result, err
+}
+
 func (repository *MySqlTodoRepository) GetTodo(id string) (*model.Todo, error) {
 	var result []*model.Todo
 
