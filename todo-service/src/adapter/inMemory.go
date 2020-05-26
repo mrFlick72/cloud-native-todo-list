@@ -13,18 +13,6 @@ func (repository *InMemoryTodoRepository) GetAllTodo() ([]*model.Todo, error) {
 	return repository.database, nil
 }
 
-func (repository *InMemoryTodoRepository) GetAllTodoByDate(date string) ([]*model.Todo, error) {
-	database := repository.database
-	filteredDatabase := []*model.Todo{}
-
-	for _, todo := range database {
-		if model.FormatDateFor(todo.Date) == date {
-			filteredDatabase = append(filteredDatabase, todo)
-		}
-	}
-	return filteredDatabase, errors.New("todo entry do not found")
-}
-
 func (repository *InMemoryTodoRepository) GetTodo(id string) (*model.Todo, error) {
 	database := repository.database
 
