@@ -30,15 +30,15 @@ services:
     networks:
       - idp
 
-#  mysql:
-#    image: mysql
-#    ports:
-#    - "3306:3306"
-#    environment:
-#      - MYSQL_ROOT_PASSWORD=root
-#      - MYSQL_DATABASE=todo
-#    volumes:
-#      - ".:/docker-entrypoint-initdb.d:ro"
+  mysql:
+    image: mysql
+    ports:
+    - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=todo
+    volumes:
+      - "./todolist:/docker-entrypoint-initdb.d:ro"
 
 networks:
   idp:
