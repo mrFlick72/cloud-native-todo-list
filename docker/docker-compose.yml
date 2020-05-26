@@ -1,20 +1,45 @@
 version: "3.7"
 
 services:
-  keyclock:
+  keyclok:
     image: jboss/keycloak
+    restart: always
     ports:
     - 8080:8080
     environment:
-      - DB_VENDOR=h2
-      - KEYCLOAK_USER=admin
-      - KEYCLOAK_PASSWORD=admin
-  mysql:
+      - DB_ADDR=keyCloackMySql
+      - DB_VENDOR=mysql
+      - DB_USER=keycloak
+      - DB_PASSWORD=password
+      - DB_SCHEMA=keycloak
+#      - KEYCLOAK_USER=admin
+#      - KEYCLOAK_PASSWORD=admin
+    networks:
+      - idp
+
+  keyCloackMySql:
     image: mysql
-    ports:
-    - "3306:3306"
     environment:
+      - MYSQL_DATABASE=keycloak
+      - MYSQL_USER=keycloak
       - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=todo
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=root_password
     volumes:
-      - ".:/docker-entrypoint-initdb.d:ro"
+          - "./keycloak:/docker-entrypoint-initdb.d"
+    networks:
+      - idp
+
+#  mysql:
+#    image: mysql
+#    ports:
+#    - "3306:3306"
+#    environment:
+#      - MYSQL_ROOT_PASSWORD=root
+#      - MYSQL_DATABASE=todo
+#    volumes:
+#      - ".:/docker-entrypoint-initdb.d:ro"
+
+networks:
+  idp:
+    driver: bridge
