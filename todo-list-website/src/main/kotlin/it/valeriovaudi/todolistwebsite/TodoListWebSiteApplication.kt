@@ -39,14 +39,19 @@ class TodoListWebSiteApplication {
         }
         POST("/todo") {
             val body = it.body(TodoRepresentation::class.java)
-            body.userName = it.principalOrNull()?.name
-            val postForEntity =
-                    restTemplate.postForEntity(
-                            "http://localhost:8000/todo",
-                            body,
-                            String::class.java
-                    )
-            ServerResponse.status(postForEntity.statusCode).build()
+            it.principal()
+                    .map { it.name }
+                    .map {
+                        body.userName = it
+                        restTemplate.postForEntity(
+                                "http://localhost:8000/todo",
+                                body,
+                                String::class.java
+                        )
+                    }
+                    .map { ServerResponse.status(it.statusCode).build() }
+                    .orElseGet { ServerResponse.unprocessableEntity().build() }
+
         }
         DELETE("/todo/{id}") {
             val id = it.pathVariable("id")
