@@ -17,7 +17,8 @@ type TodoEndpoints struct {
 }
 
 func (endpoints *TodoEndpoints) GetTodoEndpoint(c echo.Context) error {
-	allTodo, err := endpoints.TodoRepository.GetAllTodo()
+	userNameParameter := c.QueryParam("username")
+	allTodo, err := endpoints.TodoRepository.GetAllTodo(userNameParameter)
 	err = manageErrorFor(err, c)
 
 	todoRepresentation := fromDomainToRepresentationForAllTodoInList(allTodo)

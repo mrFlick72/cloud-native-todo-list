@@ -48,7 +48,7 @@ func TestMySqlTodoRepository_GetAllTodo(t *testing.T) {
 
 	expected := orderedTodoListById(aTodo, anotherTodo)
 
-	actual, err := repository.GetAllTodo()
+	actual, err := repository.GetAllTodo("user-name")
 	assertThatNoErrorFor(t, err, "some errors occurs during the select query")
 
 	assertEqualityFor(t, expected[0], actual[0])
@@ -71,7 +71,7 @@ func TestMySqlTodoRepository_RemoveTodo(t *testing.T) {
 	})
 
 	repository.RemoveTodo(anotherTodo.Id)
-	actual, err := repository.GetAllTodo()
+	actual, err := repository.GetAllTodo("user-name")
 	assertThatNoErrorFor(t, err, "some errors occurs during the select query")
 
 	assertEqualityFor(t, expected[0], actual[0])
@@ -102,7 +102,7 @@ func aNewTodo() model.Todo {
 	return model.Todo{
 		Id:       random.String(),
 		Content:  "it is a todo",
-		UserName: "my user name",
+		UserName: "user-name",
 		Date:     model.ToDay(),
 	}
 }

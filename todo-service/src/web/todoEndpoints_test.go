@@ -12,12 +12,16 @@ import (
 	"testing"
 )
 
+var (
+	userName = "user-name"
+)
+
 func TestGetAllTodo(t *testing.T) {
 	repository := adapter.InMemoryTodoRepository{}
 	initDatabase(&repository)
 	e := echo.New()
 
-	req := httptest.NewRequest(http.MethodGet, "/todo", nil)
+	req := httptest.NewRequest(http.MethodGet, "/todo?username=valerio.vaudi", nil)
 	rec := httptest.NewRecorder()
 
 	c := e.NewContext(req, rec)
@@ -33,7 +37,7 @@ func TestGetAllTodo(t *testing.T) {
 	assert.Equal(t, string(expected), actual)
 }
 func TestGetAllTodoWhenTodoIsEmpty(t *testing.T) {
-	repository := adapter.InMemoryTodoRepository{}
+	repository := adapter.InMemoryTodoRepository{Database: []*model.Todo{}}
 	e := echo.New()
 
 	req := httptest.NewRequest(http.MethodGet, "/todo", nil)
@@ -60,7 +64,7 @@ func TestGetAllTodoWhenRepositoryGoesInError(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.SetPath("/todo")
 
-	endpoint := TodoEndpoints{TodoRepository: nil}
+	endpoint := TodoEndpoints{TodoRepository: &adapter.InMemoryTodoRepository{Database: nil}}
 	endpoint.GetTodoEndpoint(c)
 
 	assert.Equal(t, http.StatusInternalServerError, rec.Code)

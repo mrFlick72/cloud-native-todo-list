@@ -6,15 +6,27 @@ import (
 )
 
 type InMemoryTodoRepository struct {
-	database []*model.Todo
+	Database []*model.Todo
 }
 
-func (repository *InMemoryTodoRepository) GetAllTodo() ([]*model.Todo, error) {
-	return repository.database, nil
+func (repository *InMemoryTodoRepository) GetAllTodo(userName string) ([]*model.Todo, error) {
+	database := repository.Database
+	var err error
+	if database == nil {
+		err = errors.New("not valid database")
+	}
+	var result = []*model.Todo{}
+
+	for _, todo := range database {
+		if todo.UserName == userName {
+			result = append(result, todo)
+		}
+	}
+	return result, err
 }
 
 func (repository *InMemoryTodoRepository) GetTodo(id string) (*model.Todo, error) {
-	database := repository.database
+	database := repository.Database
 
 	for _, todo := range database {
 		if todo.Id == id {
@@ -25,16 +37,16 @@ func (repository *InMemoryTodoRepository) GetTodo(id string) (*model.Todo, error
 }
 
 func (repository *InMemoryTodoRepository) SaveTodo(todo *model.Todo) error {
-	repository.database = append(repository.database, todo)
+	repository.Database = append(repository.Database, todo)
 	return nil
 }
 
 func (repository *InMemoryTodoRepository) RemoveTodo(id string) error {
-	database := repository.database
+	database := repository.Database
 
 	for index, todo := range database {
 		if todo.Id == id {
-			repository.database = append(database[:index], database[index+1:]...)
+			repository.Database = append(database[:index], database[index+1:]...)
 			return nil
 		}
 	}

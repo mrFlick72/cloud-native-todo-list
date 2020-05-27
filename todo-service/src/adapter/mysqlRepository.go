@@ -12,14 +12,14 @@ type MySqlTodoRepository struct {
 	ConnectionString string
 }
 
-func (repository *MySqlTodoRepository) GetAllTodo() ([]*model.Todo, error) {
+func (repository *MySqlTodoRepository) GetAllTodo(userName string) ([]*model.Todo, error) {
 	result := []*model.Todo{}
 
 	database, err := openConnectionFor(repository)
 	errorLog(err)
 
-	query, _ := database.Prepare("SELECT id, user_name as username, date, content FROM TODO")
-	rows, err := query.Query()
+	query, _ := database.Prepare("SELECT id, user_name as username, date, content FROM TODO where user_name = ?")
+	rows, err := query.Query(userName)
 	errorLog(err)
 
 	result = buildTodos(rows, result)

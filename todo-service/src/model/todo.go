@@ -10,7 +10,7 @@ type Todo struct {
 }
 
 type TodoRepository interface {
-	GetAllTodo() ([]*Todo, error)
+	GetAllTodo(userName string) ([]*Todo, error)
 	GetTodo(id string) (*Todo, error)
 	SaveTodo(todo *Todo) error
 	RemoveTodo(id string) error
