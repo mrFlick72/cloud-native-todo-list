@@ -1,7 +1,6 @@
-const todoServiceHost = "http://localhost:8000"
 
 export function insertTodoFor(todo) {
-    return fetch(`${todoServiceHost}/todo`, {
+    return fetch(`/website/todo`, {
         method: "POST",
         headers: {
             "Accept": "application/json",
@@ -12,8 +11,8 @@ export function insertTodoFor(todo) {
     })
 }
 
-export function readAllTodoFor(today) {
-    return fetch(`${todoServiceHost}/todo?day=${today}`, {
+export function readAllTodo() {
+    return fetch(`/website/todo`, {
         method: "GET",
         headers: {
             "Accept": "application/json"
@@ -23,7 +22,7 @@ export function readAllTodoFor(today) {
 }
 
 export function deleteTodoFor(todoId) {
-    return fetch(`${todoServiceHost}/todo/${todoId}`, {
+    return fetch(`/website/todo/${todoId}`, {
         method: "DELETE",
         credentials: 'same-origin'
     }).then((response => new Promise((resolve, reject) => {

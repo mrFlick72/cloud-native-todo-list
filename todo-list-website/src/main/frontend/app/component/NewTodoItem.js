@@ -35,8 +35,6 @@ export default function NewTodoItem({open, onClose, onSave}) {
                             variant="outlined"
                             onClick={() => {
                                 insertTodoFor({
-                                    id: uuidv4(),
-                                    userName: "",
                                     date: moment().format('YYYY-MM-DD'),
                                     content: content
                                 }).then(_ => {

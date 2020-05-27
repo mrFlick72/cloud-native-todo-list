@@ -1,6 +1,6 @@
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import React, {useEffect, useState} from "react";
-import {deleteTodoFor, readAllTodoFor} from "../domain/repository/TodoRepository";
+import {deleteTodoFor, readAllTodo} from "../domain/repository/TodoRepository";
 import {AddCircle, Delete} from "@material-ui/icons";
 import {Container} from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
@@ -40,8 +40,8 @@ export default function TodoListPage() {
     const handleOpen = () => setOpen(true)
     const [todoList, setTodoList] = useState([])
 
-    const fetchTodoListForToDay = () => {
-        readAllTodoFor(new Date().getTime())
+    const fetchTodoList = () => {
+        readAllTodo()
             .then(value => {
                 let rows = value.map(value => {
                     value.id = value.id
@@ -58,19 +58,19 @@ export default function TodoListPage() {
             deleteTodoFor(todoId)
                 .then(response => {
                     if (response) {
-                        fetchTodoListForToDay();
+                        fetchTodoList();
                     }
                 })
         }}/>;
     }
 
     useEffect(() => {
-        fetchTodoListForToDay();
+        fetchTodoList();
     }, [])
 
     return (
         <div className={classes.root}>
-            <NewTodoItem open={open} onClose={handleClose} onSave={fetchTodoListForToDay}/>
+            <NewTodoItem open={open} onClose={handleClose} onSave={fetchTodoList}/>
 
             <Container maxWidth="sm">
 
