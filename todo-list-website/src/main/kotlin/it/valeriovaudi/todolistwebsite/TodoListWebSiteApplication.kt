@@ -1,5 +1,6 @@
 package it.valeriovaudi.todolistwebsite
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
@@ -20,14 +21,14 @@ import java.util.*
 class TodoListWebSiteApplication {
 
     @Bean
-    fun todoRoutes() = router {
+    fun todoRoutes(@Value("\${todo.base-url}") baseUrl : String) = router {
         val restTemplate = RestTemplate()
         GET("/todo") {
             it.principal()
                     .map { it.name }
                     .map {
                         restTemplate.exchange(
-                                "http://localhost:8000/todo?username=$it",
+                                "${baseUrl}/todo?username=$it",
                                 HttpMethod.GET,
                                 RequestEntity.EMPTY,
                                 typeRef<List<TodoRepresentation>>()
@@ -44,7 +45,7 @@ class TodoListWebSiteApplication {
                     .map {
                         body.userName = it
                         restTemplate.postForEntity(
-                                "http://localhost:8000/todo",
+                                "${baseUrl}/todo",
                                 body,
                                 String::class.java
                         )
@@ -55,7 +56,7 @@ class TodoListWebSiteApplication {
         }
         DELETE("/todo/{id}") {
             val id = it.pathVariable("id")
-            restTemplate.delete("http://localhost:8000/todo/$id")
+            restTemplate.delete("${baseUrl}/todo/$id")
             ServerResponse.noContent().build()
         }
     }
