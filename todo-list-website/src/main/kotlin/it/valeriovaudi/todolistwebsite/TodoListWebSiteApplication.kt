@@ -30,7 +30,7 @@ class TodoListWebSiteApplication {
                                 "http://localhost:8000/todo?username=$it",
                                 HttpMethod.GET,
                                 RequestEntity.EMPTY,
-                                typeRef<List<Todo>>()
+                                typeRef<List<TodoRepresentation>>()
                         ).body
                     }
                     .map { ok().body(it!!) }
@@ -38,7 +38,7 @@ class TodoListWebSiteApplication {
 
         }
         POST("/todo") {
-            val body = it.body(Todo::class.java)
+            val body = it.body(TodoRepresentation::class.java)
             body.userName = it.principalOrNull()?.name
             val postForEntity =
                     restTemplate.postForEntity(
@@ -55,11 +55,11 @@ class TodoListWebSiteApplication {
         }
     }
 }
-int
-data class Todo(var id: String = UUID.randomUUID().toString(),
-                var date: String,
-                var userName: String?,
-                var content: String)
+
+data class TodoRepresentation(var id: String = UUID.randomUUID().toString(),
+                              var date: String,
+                              var userName: String?,
+                              var content: String)
 
 inline fun <reified T : Any> typeRef(): ParameterizedTypeReference<T> = object : ParameterizedTypeReference<T>() {}
 
