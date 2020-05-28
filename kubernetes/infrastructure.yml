@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: infrastructure
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: database-pv
+  namespace: infrastructure
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  storageClassName: database
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /mnt/data
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: database-pvc
+  namespace: infrastructure
+spec:
+  storageClassName: database
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: infrastructure
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      volumes:
+        - name: mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: database-pvc
+
+      containers:
+        - name: mysql
+          image: mysql
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: root
+
+          volumeMounts:
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: infrastructure
+spec:
+  selector:
+    app: mysql
+  ports:
+    - port: 3306

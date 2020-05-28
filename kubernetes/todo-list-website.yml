@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: todo-list-website
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: todo-list-website
+  namespace: todo-list-website
+data:
+  application.yml: |-
+    spring:
+      application:
+        name: todolist-website
+      security:
+        oauth2:
+          client:
+            registration:
+              keycloak:
+                client-id: application
+                client-secret: "b047cc08-f324-4bd4-a7fa-31d8ddbc08e6"
+                clientName: Keycloak
+                authorization-grant-type: authorization_code
+                redirect-uri: http://localhost:3000/website/login/oauth2/code/keycloak
+                scope:
+                  - openid
+                  - profile
+                  - email
+            provider:
+              keycloak:
+                authorization-uri: "http://localhost:8080/auth/realms/todo-list/protocol/openid-connect/auth"
+                token-uri: "http://localhost:8080/auth/realms/todo-list/protocol/openid-connect/token"
+                user-info-uri: "http://localhost:8080/auth/realms/todo-list/protocol/openid-connect/userinfo"
+                jwk-set-uri: "http://localhost:8080/auth/realms/todo-list/protocol/openid-connect/certs"
+                user-name-attribute: preferred_username
+    server:
+      servlet:
+        context-path: /website
+
+    todo:
+      base-url: http://localhost:8000
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-list-website-deployment
+  namespace: todo-list-website
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-list-website
+  template:
+    metadata:
+      labels:
+        app: todo-list-website
+    spec:
+      volumes:
+        - name: application-config
+          configMap:
+            name: todo-list-website
+      containers:
+        - name: ..
+          volumeMounts:
+            - mountPath: /usr/local/todo-list-website/application.yml
+              subPath: application.yml
+              name: application-config
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: todo-list-website
+  namespace: todo-list-website
+spec:
+  selector:
+    app: todo-list-website
+  ports:
+    - port: 8080
