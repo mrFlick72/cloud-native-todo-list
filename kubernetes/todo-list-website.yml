@@ -11,6 +11,8 @@ metadata:
   namespace: todo-list-website
 data:
   application.yml: |-
+    localhost.url: http://192.168.99.101
+
     spring:
       application:
         name: todolist-website
@@ -23,30 +25,30 @@ data:
                 client-secret: "b047cc08-f324-4bd4-a7fa-31d8ddbc08e6"
                 clientName: Keycloak
                 authorization-grant-type: authorization_code
-                redirect-uri: http://localhost:3000/website/login/oauth2/code/keycloak
+                redirect-uri: ${localhost.url}/website/login/oauth2/code/keycloak
                 scope:
                   - openid
                   - profile
                   - email
             provider:
               keycloak:
-                authorization-uri: "http://localhost:8080/auth/realms/todo-list/protocol/openid-connect/auth"
-                token-uri: "http://localhost:8080/auth/realms/todo-list/protocol/openid-connect/token"
-                user-info-uri: "http://localhost:8080/auth/realms/todo-list/protocol/openid-connect/userinfo"
-                jwk-set-uri: "http://localhost:8080/auth/realms/todo-list/protocol/openid-connect/certs"
+                authorization-uri: "${localhost.url}/auth/realms/todo-list/protocol/openid-connect/auth"
+                token-uri: "${localhost.url}/auth/realms/todo-list/protocol/openid-connect/token"
+                user-info-uri: "${localhost.url}/auth/realms/todo-list/protocol/openid-connect/userinfo"
+                jwk-set-uri: "${localhost.url}/auth/realms/todo-list/protocol/openid-connect/certs"
                 user-name-attribute: preferred_username
     server:
       servlet:
         context-path: /website
 
     todo:
-      base-url: http://localhost:8000
+      base-url: http://todo-service:8000
 ---
 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: todo-list-website-deployment
+  name: todo-list-website
   namespace: todo-list-website
 spec:
   replicas: 1
@@ -63,7 +65,9 @@ spec:
           configMap:
             name: todo-list-website
       containers:
-        - name: ..
+        - name: todo-list-website
+          image: mrflick72/todo-list-website:latest
+          imagePullPolicy: Never
           volumeMounts:
             - mountPath: /usr/local/todo-list-website/application.yml
               subPath: application.yml
@@ -81,3 +85,19 @@ spec:
     app: todo-list-website
   ports:
     - port: 8080
+
+---
+
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: todo-list-website
+  namespace: todo-list-website
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /website
+            backend:
+              serviceName: todo-list-website
+              servicePort: 8080

@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: todo-service
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: todo-service
+  namespace: todo-service
+data:
+  DATABASE_USER: root
+  DATABASE_PASSWORD: root
+
+---
+
+apiVersion: apps/v1
+kind: Deployment  
+metadata:
+  name: todo-service
+  namespace: todo-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-service
+  template:
+    metadata:
+      labels:
+        app: todo-service
+    spec:
+      volumes:
+        - name: application-config
+          configMap:
+            name: todo-service
+      containers:
+        - name: todo-service
+          image: mrflick72/todo-service:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DATABASE_URL
+              value: mysql.infrastructure.svc.cluster.local
+          envFrom:
+            - secretRef:
+                name: todo-service
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: todo-service
+  namespace: todo-service
+spec:
+  selector:
+    app: todo-service
+  ports:
+    - port: 8080

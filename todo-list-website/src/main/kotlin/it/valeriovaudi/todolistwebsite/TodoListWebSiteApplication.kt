@@ -12,7 +12,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.servlet.function.ServerResponse
-import org.springframework.web.servlet.function.principalOrNull
 import org.springframework.web.servlet.function.router
 import java.util.*
 
