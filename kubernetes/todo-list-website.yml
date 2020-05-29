@@ -14,6 +14,8 @@ data:
     localhost.url: http://192.168.99.101
 
     spring:
+      redis:
+        host: redis.infrastructure.svc.cluster.local
       application:
         name: todolist-website
       security:
