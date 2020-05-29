@@ -6,6 +6,18 @@ metadata:
 ---
 
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: infrastructure
+  name: mysql-initdb-config
+data:
+  schema.sql: |-
+    CREATE DATABASE todo;
+    CREATE DATABASE keycloak;
+
+---
+
+apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: database-pv
@@ -60,9 +72,11 @@ spec:
         - name: mysql-persistent-storage
           persistentVolumeClaim:
             claimName: database-pvc
-
+        - name: mysql-initdb
+          configMap:
+            name: mysql-initdb-config
       initContainers:
-        - name: database-schema-init
+        - name: schema-init
           image: mwendler/wget
           command: ["wget","--no-check-certificate","https://raw.githubusercontent.com/mrFlick72/cloud-native-todo-list/master/docker/database/schema.sql","-O","/docker-entrypoint-initdb.d/schema.sql"]
           volumeMounts:
