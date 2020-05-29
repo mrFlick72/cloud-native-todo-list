@@ -27,6 +27,8 @@ spec:
           env:
             - name: DB_ADDR
               value: "mysql.infrastructure.svc.cluster.local"
+            - name: DB_VENDOR
+              value: "mysql"
             - name: DB_USER
               value: "root"
             - name: DB_PASSWORD
