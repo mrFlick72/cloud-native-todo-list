@@ -12,8 +12,6 @@ services:
       - DB_USER=keycloak
       - DB_PASSWORD=password
       - DB_SCHEMA=keycloak
-#      - KEYCLOAK_USER=admin
-#      - KEYCLOAK_PASSWORD=admin
     networks:
       - idp
 
@@ -26,7 +24,7 @@ services:
       - MYSQL_PASSWORD=password
       - MYSQL_ROOT_PASSWORD=root_password
     volumes:
-          - "./keycloak:/docker-entrypoint-initdb.d"
+      - "./database/keycloak.sql:/docker-entrypoint-initdb.d/keycloak.sql"
     networks:
       - idp
 
@@ -38,7 +36,7 @@ services:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=todo
     volumes:
-      - "./todolist:/docker-entrypoint-initdb.d:ro"
+      - "./database/todo.sql:/docker-entrypoint-initdb.d/todo.sql"
 
 networks:
   idp:
