@@ -78,25 +78,19 @@ spec:
       initContainers:
         - name: schema-init
           image: mwendler/wget
-          command: ["wget","--no-check-certificate","https://raw.githubusercontent.com/mrFlick72/cloud-native-todo-list/master/docker/database/schema.sql","-O","/docker-entrypoint-initdb.d/schema.sql"]
+          command: [
+            'sh',
+            '-c',
+            'wget --no-check-certificate  -O - https://raw.githubusercontent.com/mrFlick72/cloud-native-todo-list/master/docker/database/schema.sql >> /docker-entrypoint-initdb.d/build.sql',
+            'echo -en "\n" >> /docker-entrypoint-initdb.d/build.sql',
+            'wget --no-check-certificate -O - https://raw.githubusercontent.com/mrFlick72/cloud-native-todo-list/master/docker/database/todo.sql >> /docker-entrypoint-initdb.d/build.sql',
+            'echo -en "\n" >> /docker-entrypoint-initdb.d/build.sql',
+            'wget --no-check-certificate -O - https://raw.githubusercontent.com/mrFlick72/cloud-native-todo-list/master/docker/database/keycloak.sql >> /docker-entrypoint-initdb.d/build.sql'
+          ]
           volumeMounts:
             - mountPath: /docker-entrypoint-initdb.d
               name: dump
 
-        - name: todo-list-schema-init
-          image: mwendler/wget
-          command: ["wget","--no-check-certificate","https://raw.githubusercontent.com/mrFlick72/cloud-native-todo-list/master/docker/database/todo.sql","-O","/docker-entrypoint-initdb.d/todo.sql"]
-          volumeMounts:
-            - mountPath: /docker-entrypoint-initdb.d
-              name: dump
-
-
-        - name: keycloak-schema-init
-          image: mwendler/wget
-          command: ["wget","--no-check-certificate","https://raw.githubusercontent.com/mrFlick72/cloud-native-todo-list/master/docker/database/keycloak.sql","-O","/docker-entrypoint-initdb.d/keycloak.sql"]
-          volumeMounts:
-            - mountPath: /docker-entrypoint-initdb.d
-              name: dump
 
       containers:
         - name: mysql

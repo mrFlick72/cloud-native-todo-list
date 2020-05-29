@@ -1,3 +1,13 @@
 ---
 
 #todo
+
+
+
+wget --no-check-certificate  -O - https://raw.githubusercontent.com/mrFlick72/cloud-native-todo-list/master/docker/database/schema.sql >> build.sql && \
+echo -en "\n" >> build.sql && \
+
+wget --no-check-certificate -O - https://raw.githubusercontent.com/mrFlick72/cloud-native-todo-list/master/docker/database/todo.sql >> build.sql && \
+echo -en "\n" >> build.sql && \
+
+wget --no-check-certificate -O - https://raw.githubusercontent.com/mrFlick72/cloud-native-todo-list/master/docker/database/keycloak.sql >> build.sql
