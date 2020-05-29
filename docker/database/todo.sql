@@ -1,3 +1,5 @@
+USE todo;
+
 CREATE TABLE TODO (
     id VARCHAR(255) NOT NULL,
     user_name VARCHAR(255) NOT NULL,

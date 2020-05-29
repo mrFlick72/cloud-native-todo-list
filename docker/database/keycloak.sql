@@ -18,6 +18,7 @@
 --
 -- Table structure for table `ADMIN_EVENT_ENTITY`
 --
+USE keycloak;
 
 DROP TABLE IF EXISTS `ADMIN_EVENT_ENTITY`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
