@@ -6,18 +6,6 @@ metadata:
 ---
 
 apiVersion: v1
-kind: ConfigMap
-metadata:
-  namespace: infrastructure
-  name: mysql-initdb-config
-data:
-  schema.sql: |-
-    CREATE DATABASE todo;
-    CREATE DATABASE keycloak;
-
----
-
-apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: database-pv
@@ -72,9 +60,7 @@ spec:
         - name: mysql-persistent-storage
           persistentVolumeClaim:
             claimName: database-pvc
-        - name: mysql-initdb
-          configMap:
-            name: mysql-initdb-config
+
       initContainers:
         - name: schema-init
           image: mwendler/wget
