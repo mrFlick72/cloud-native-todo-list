@@ -72,6 +72,14 @@ spec:
         - name: mysql-initdb
           configMap:
             name: mysql-initdb-config
+      initContainers:
+        - name: todo-list-schema-init
+          image: busybox
+          command: ["wget","--no-check-certificate","https://raw.githubusercontent.com/mrFlick72/cloud-native-todo-list/master/docker/database/todo.sql","-O","/docker-entrypoint-initdb.d/todo.sql"]
+        - name: keycloak-schema-init
+          image: busybox
+          command: ["wget","--no-check-certificate","https://raw.githubusercontent.com/mrFlick72/cloud-native-todo-list/master/docker/database/keycloak.sql","-O","/docker-entrypoint-initdb.d/keycloak.sql"]
+
       containers:
         - name: mysql
           image: mysql
@@ -83,7 +91,8 @@ spec:
 
           volumeMounts:
             - name: mysql-initdb
-              mountPath: /docker-entrypoint-initdb.d
+              mountPath: /docker-entrypoint-initdb.d/todo.sql
+              subPath: todo.sql
 
             - name: mysql-persistent-storage
               mountPath: /var/lib/mysql
