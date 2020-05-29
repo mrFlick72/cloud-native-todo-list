@@ -6,18 +6,6 @@ metadata:
 ---
 
 apiVersion: v1
-kind: ConfigMap
-metadata:
-  namespace: infrastructure
-  name: mysql-initdb-config
-data:
-  schema.sql: |-
-    CREATE DATABASE todo;
-    CREATE DATABASE keycloak;
-
----
-
-apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: database-pv
@@ -66,19 +54,35 @@ spec:
         app: mysql
     spec:
       volumes:
+        - emptyDir: {}
+          name: dump
+
         - name: mysql-persistent-storage
           persistentVolumeClaim:
             claimName: database-pvc
-        - name: mysql-initdb
-          configMap:
-            name: mysql-initdb-config
+
       initContainers:
+        - name: database-schema-init
+          image: mwendler/wget
+          command: ["wget","--no-check-certificate","https://raw.githubusercontent.com/mrFlick72/cloud-native-todo-list/master/docker/database/schema.sql","-O","/docker-entrypoint-initdb.d/schema.sql"]
+          volumeMounts:
+            - mountPath: /docker-entrypoint-initdb.d
+              name: dump
+
         - name: todo-list-schema-init
-          image: busybox
+          image: mwendler/wget
           command: ["wget","--no-check-certificate","https://raw.githubusercontent.com/mrFlick72/cloud-native-todo-list/master/docker/database/todo.sql","-O","/docker-entrypoint-initdb.d/todo.sql"]
+          volumeMounts:
+            - mountPath: /docker-entrypoint-initdb.d
+              name: dump
+
+
         - name: keycloak-schema-init
-          image: busybox
+          image: mwendler/wget
           command: ["wget","--no-check-certificate","https://raw.githubusercontent.com/mrFlick72/cloud-native-todo-list/master/docker/database/keycloak.sql","-O","/docker-entrypoint-initdb.d/keycloak.sql"]
+          volumeMounts:
+            - mountPath: /docker-entrypoint-initdb.d
+              name: dump
 
       containers:
         - name: mysql
@@ -90,9 +94,8 @@ spec:
               value: root
 
           volumeMounts:
-            - name: mysql-initdb
-              mountPath: /docker-entrypoint-initdb.d/todo.sql
-              subPath: todo.sql
+            - name: dump
+              mountPath: /docker-entrypoint-initdb.d
 
             - name: mysql-persistent-storage
               mountPath: /var/lib/mysql

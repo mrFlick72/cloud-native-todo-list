@@ -1,0 +1,2 @@
+CREATE DATABASE todo;
+CREATE DATABASE keycloak;
