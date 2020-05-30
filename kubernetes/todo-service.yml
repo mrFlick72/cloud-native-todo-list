@@ -10,7 +10,7 @@ kind: Secret
 metadata:
   name: todo-service
   namespace: todo-service
-data:
+stringData:
   DATABASE_USER: root
   DATABASE_PASSWORD: root
 

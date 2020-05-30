@@ -26,8 +26,8 @@ func main() {
 	}))
 	server.Use(middleware.Logger())
 
-	webserverPort := os.Getenv("WEB_SERVER_PORT")
-	server.Start(fmt.Sprintf(":%v", webserverPort))
+	webServerPort := os.Getenv("WEB_SERVER_PORT")
+	server.Start(fmt.Sprintf(":%v", webServerPort))
 }
 
 func databaseConnectionStringFromEnv() string {
