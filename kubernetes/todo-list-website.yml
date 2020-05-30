@@ -34,10 +34,10 @@ data:
                   - email
             provider:
               keycloak:
-                authorization-uri: "${localhost.url}/auth/realms/todo-list/protocol/openid-connect/auth"
-                token-uri: "${localhost.url}/auth/realms/todo-list/protocol/openid-connect/token"
-                user-info-uri: "${localhost.url}/auth/realms/todo-list/protocol/openid-connect/userinfo"
-                jwk-set-uri: "${localhost.url}/auth/realms/todo-list/protocol/openid-connect/certs"
+                authorization-uri: ${localhost.url}/auth/realms/todo-list/protocol/openid-connect/auth
+                token-uri: ${localhost.url}/auth/realms/todo-list/protocol/openid-connect/token
+                user-info-uri: ${localhost.url}/auth/realms/todo-list/protocol/openid-connect/userinfo
+                jwk-set-uri: ${localhost.url}/auth/realms/todo-list/protocol/openid-connect/certs
                 user-name-attribute: preferred_username
     server:
       servlet:
