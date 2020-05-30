@@ -23,16 +23,17 @@ First of all you need fo three things: kubernetes, istio and an envoy proxy for 
     * start Envoy via ```docker-compose up``` command via terminal under `docker/envoy` folder
 
 ## build local image eligible to minikube
-```bash
+Pushing directly to the in-cluster Docker daemon (docker-env) [for more information](https://minikube.sigs.k8s.io/docs/handbook/pushing/#5-building-images-inside-of-minikube-using-ssh) 
+```eval $(minikube --profile istio docker-env) ```
 
-eval $(minikube --profile istio docker-env) // this 
+in the same shell of the previous command 
+mvn clean install of todo-list-website copy the Dockerfile under todo-list-website/src/main/docker 
+in todo-list-website/target and fire the command ```docker build --tag mrflick72/todo-list-website:latest .```
 
-docker build --tag mrflick72/todo-list-website:latest .
-docker build --tag mrflick72/todo-service:latest .
-
-```
+move in todo-service folder and fire the follow command ```docker build --tag mrflick72/todo-service:latest .```
 
 ## inject envoy proxy for istio
+in order to deply all k8s yaml instrumented by istio execute the follow commands
 ```bash
 istioctl kube-inject -f infrastructure.yml | kubectl apply -f -
 istioctl kube-inject -f keycloak.yml | kubectl apply -f -
