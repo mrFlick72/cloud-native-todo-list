@@ -1880,7 +1880,7 @@ CREATE TABLE `REDIRECT_URIS` (
 
 LOCK TABLES `REDIRECT_URIS` WRITE;
 /*!40000 ALTER TABLE `REDIRECT_URIS` DISABLE KEYS */;
-INSERT INTO `REDIRECT_URIS` VALUES ('10518c10-7dcb-44a5-a221-c11aa69e032b','/admin/master/console/*'),('37ba1f70-153a-442d-994b-b3509046741d','http://localhost:3000/website/login/oauth2/code/keycloak'),('43dd5258-f161-4f7d-b012-3a446a9db4d2','/realms/master/account/*'),('4eb6fc29-4b50-42c5-8c1a-5d5a788f5089','/realms/todo-list/account/*'),('6b8a5f78-3ce7-4b61-8199-a96d1f7311f7','/realms/todo-list/account/*'),('78e06407-f9d5-4969-bfac-b30de79b681c','/admin/todo-list/console/*'),('9f2d9e02-424b-4e81-96ec-82f4cbbd49dd','/realms/master/account/*');
+INSERT INTO `REDIRECT_URIS` VALUES ('10518c10-7dcb-44a5-a221-c11aa69e032b','/admin/master/console/*'),('37ba1f70-153a-442d-994b-b3509046741d','http://localhost/website/login/oauth2/code/keycloak'),('43dd5258-f161-4f7d-b012-3a446a9db4d2','/realms/master/account/*'),('4eb6fc29-4b50-42c5-8c1a-5d5a788f5089','/realms/todo-list/account/*'),('6b8a5f78-3ce7-4b61-8199-a96d1f7311f7','/realms/todo-list/account/*'),('78e06407-f9d5-4969-bfac-b30de79b681c','/admin/todo-list/console/*'),('9f2d9e02-424b-4e81-96ec-82f4cbbd49dd','/realms/master/account/*');
 /*!40000 ALTER TABLE `REDIRECT_URIS` ENABLE KEYS */;
 UNLOCK TABLES;
 

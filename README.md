@@ -18,12 +18,14 @@ First of all you need fo three things: kubernetes, istio and an envoy proxy for 
     * un package the tar
     * Put ```export PATH=$PWD/bin:$PATH``` in your permanent environment
     * type teh command ```istioctl manifest apply --set profile=demo```
-*  get the minikube ip with the command ```minikube ip --profile istio``` and put the value in the ${MINIKUBE_IP} placeholder in envoy.yaml file under `docker/envoy` folder
+*  configure envoy proxy in order to access to application via localhost
+    * get the minikube ip with the command ```minikube ip --profile istio``` and put the value in the ${MINIKUBE_IP} placeholder in envoy.yaml file under `docker/envoy` folder
+    * start Envoy via ```docker-compose up``` command via terminal under `docker/envoy` folder
 
 ## build local image eligible to minikube
 ```bash
 
-eval $(minikube --profile istio docker-env)
+eval $(minikube --profile istio docker-env) // this 
 
 docker build --tag mrflick72/todo-list-website:latest .
 docker build --tag mrflick72/todo-service:latest .
