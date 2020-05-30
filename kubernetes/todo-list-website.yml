@@ -11,7 +11,7 @@ metadata:
   namespace: todo-list-website
 data:
   application.yml: |-
-    localhost.url: ${MINIKUBE_IP}
+    localhost.url: http://${MINIKUBE_IP}
 
     spring:
       redis:

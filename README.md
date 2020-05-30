@@ -18,9 +18,6 @@ First of all you need fo three things: kubernetes, istio and an envoy proxy for 
     * un package the tar
     * Put ```export PATH=$PWD/bin:$PATH``` in your permanent environment
     * type teh command ```istioctl manifest apply --set profile=demo```
-*  configure envoy proxy in order to access to application via localhost
-    * get the minikube ip with the command ```minikube ip --profile istio``` and put the value in the ${MINIKUBE_IP} placeholder in envoy.yaml file under `docker/envoy` folder
-    * start Envoy via ```docker-compose up``` command via terminal under `docker/envoy` folder
 
 ## build local image eligible to minikube
 Pushing directly to the in-cluster Docker daemon (docker-env) [for more information](https://minikube.sigs.k8s.io/docs/handbook/pushing/#5-building-images-inside-of-minikube-using-ssh) 
@@ -33,11 +30,38 @@ in todo-list-website/target and fire the command ```docker build --tag mrflick72
 move in todo-service folder and fire the follow command ```docker build --tag mrflick72/todo-service:latest .```
 
 ## inject envoy proxy for istio
-in order to deply all k8s yaml instrumented by istio execute the follow commands
+in order to deploy all k8s yaml instrumented by istio execute the follow commands
+PAY ATTENTION!!! in todo-list-website.yml there is a ${MINIKUBE_IP} placeholder this have to replaced with ```minikube ip --profile istio``` value
 ```bash
 istioctl kube-inject -f infrastructure.yml | kubectl apply -f -
 istioctl kube-inject -f keycloak.yml | kubectl apply -f -
 istioctl kube-inject -f todo-list-website.yml | kubectl apply -f -
 istioctl kube-inject -f todo-service.yml | kubectl apply -f -
-
 ```
+
+## application configuration post installation
+
+after that all pods are up and running the last step to configure is the redirect uri of auth2 client application configured for the use case. 
+Follow the link http://${MINIKUBE_IP}/auth/admin/master/console/#/realms/todo-list/clients/37ba1f70-153a-442d-994b-b3509046741d 
+and make the ```* Valid Redirect URIs ``` value with the same ip of your cluster for instance if your MINIKUBE_IP is 
+193.168.99.101 the complete link will be: ```http://193.168.99.101/website/login/oauth2/code/keycloak```
+
+in order to access to keycloak admin pages, admin user credentials are the most classical admin admin credentials.
+
+After all you can use the cloud native todo list app wia http://${MINIKUBE_IP}/website link. In this case the default user credentials 
+are...... user secret.
+
+## Istio goodies
+Now that the app is up and running in order to explore the power of istio even with only envoy proxy in place you can type the command:
+```istioctl dasboard grafana```
+```istioctl dasboard kiali```
+```istioctl dasboard jaeger```
+and automatically you can start to explore:
+* On grafana how so many metrics out of the box you can leverage by the platform
+* On jaeger how even without the powerful spring cloud sleuth used on the website, you can leverage of distributed tracing spanned from teh website to the service written in GO 
+* On kiali the topological insight that istio can infer from the platform in order to manage your service mesh.
+
+## Conclusion
+Istio is a super powerful platform that can help you to manage your service mesh, in kubernetes or bare metal in a consistent way. 
+Thats all?......... no it is only the surface stay tuned soon other improvement and example of how leverage of Istio feature will come!
+ 
