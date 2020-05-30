@@ -42,8 +42,10 @@ spec:
           ports:
             - containerPort: 8080
           env:
+            - name: WEB_SERVER_PORT
+              value: "8080"
             - name: DATABASE_URL
-              value: mysql.infrastructure.svc.cluster.local
+              value: "mysql.infrastructure.svc.cluster.local"
           envFrom:
             - secretRef:
                 name: todo-service

@@ -26,13 +26,14 @@ func main() {
 	}))
 	server.Use(middleware.Logger())
 
-	server.Start(":8000")
+	webserverPort := os.Getenv("WEB_SERVER_PORT")
+	server.Start(fmt.Sprintf(":%v", webserverPort))
 }
 
 func databaseConnectionStringFromEnv() string {
 	databaseUrl := os.Getenv("DATABASE_URL")
 	databaseUserName := os.Getenv("DATABASE_USER")
 	databasePassword := os.Getenv("DATABASE_PASSWORD")
-	databaseConnectionString := fmt.Sprintf("%v:%v@tcp(%v)/todo?parseTime=true", databaseUrl, databaseUserName, databasePassword)
+	databaseConnectionString := fmt.Sprintf("%v:%v@tcp(%v)/todo?parseTime=true", databaseUserName, databasePassword, databaseUrl)
 	return databaseConnectionString
 }
