@@ -2,7 +2,7 @@ package adapter
 
 import (
 	"database/sql"
-	"fmt"
+	"githab/mrflick72/cloud-native-todo-list/todo-service/src/logging"
 	"githab/mrflick72/cloud-native-todo-list/todo-service/src/model"
 	_ "github.com/go-sql-driver/mysql"
 	"time"
@@ -85,7 +85,9 @@ func buildTodos(rows *sql.Rows, result []*model.Todo) []*model.Todo {
 	for rows.Next() {
 		var id, content, username string
 		var date time.Time
-		rows.Scan(&id, &username, &date, &content)
+		err := rows.Scan(&id, &username, &date, &content)
+		errorLog(err)
+
 		result = append(result, &model.Todo{
 			Id:       id,
 			UserName: username,
@@ -98,7 +100,6 @@ func buildTodos(rows *sql.Rows, result []*model.Todo) []*model.Todo {
 
 func errorLog(err error) {
 	if err != nil {
-		fmt.Println(err)
-		panic(err.Error())
+		logging.LogErrorFor(err)
 	}
 }

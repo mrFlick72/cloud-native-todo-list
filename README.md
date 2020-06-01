@@ -29,11 +29,18 @@ in todo-list-website/target and fire the command ```docker build --tag mrflick72
 
 move in todo-service folder and fire the follow command ```docker build --tag mrflick72/todo-service:latest .```
 
+## persistance storage directory
+In order to benefit of persistance volume you have to connect via ssh to your kubernetes nodes, if you are using minikube 
+you can type this command ```minikube ssh -p istio```. After this command you are connected to minikube, now you can create your 
+directory, type command ```sudo mkdir -p /mnt/data/mysql``` in order to have hte mysql directory, then type command 
+```sudo mkdir -m 777 -p /mnt/data/log/elastic``` 
+ 
 ## inject envoy proxy for istio
 in order to deploy all k8s yaml instrumented by istio execute the follow commands
 PAY ATTENTION!!! in todo-list-website.yml there is a ${MINIKUBE_IP} placeholder this have to replaced with ```minikube ip --profile istio``` value
 ```bash
 istioctl kube-inject -f infrastructure.yml | kubectl apply -f -
+istioctl kube-inject -f monitoring.yml | kubectl apply -f -
 istioctl kube-inject -f keycloak.yml | kubectl apply -f -
 istioctl kube-inject -f todo-list-website.yml | kubectl apply -f -
 istioctl kube-inject -f todo-service.yml | kubectl apply -f -
@@ -53,9 +60,9 @@ are...... user secret.
 
 ## Istio goodies
 Now that the app is up and running in order to explore the power of istio even with only envoy proxy in place you can type the command:
-```istioctl dasboard grafana```
-```istioctl dasboard kiali```
-```istioctl dasboard jaeger```
+```istioctl dashboard grafana```
+```istioctl dashboard kiali```
+```istioctl dashboard jaeger```
 and automatically you can start to explore:
 * On grafana how so many metrics out of the box you can leverage by the platform
 * On jaeger how even without the powerful spring cloud sleuth used on the website, you can leverage of distributed tracing spanned from teh website to the service written in GO 

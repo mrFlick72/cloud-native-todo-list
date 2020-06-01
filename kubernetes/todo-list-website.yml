@@ -4,6 +4,40 @@ metadata:
   name: todo-list-website
 
 ---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filebeat-config
+  namespace: todo-list-website
+data:
+  filebeat.yml: |-
+    filebeat.config:
+      modules:
+        path: ${path.config}/modules.d/*.yml
+        reload.enabled: true
+
+    filebeat.inputs:
+      - type: log
+        multiline.pattern: '^java.|^[[:space:]]+(at|\.{3})\b|^Caused by:|^END:'
+        multiline.negate: false
+        multiline.match: after
+
+        enabled: true
+        paths:
+          - /var/log/todo-list/*.log
+
+    processors:
+      - add_cloud_metadata: ~
+      - add_docker_metadata: ~
+
+    setup.kibana:
+      host: "kibana.monitoring.svc.cluster.local:5601"
+
+    output.elasticsearch:
+      hosts: ['elasticsearch.monitoring.svc.cluster.local:9200']
+
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -11,13 +45,16 @@ metadata:
   namespace: todo-list-website
 data:
   application.yml: |-
-    localhost.url: http://${MINIKUBE_IP}
+    localhost.url: http://192.168.99.101
 
     spring:
-      redis:
-        host: redis.infrastructure.svc.cluster.local
       application:
         name: todolist-website
+      sleuth:
+        redis:
+          enabled: false
+      redis:
+        host: redis.infrastructure.svc.cluster.local
       security:
         oauth2:
           client:
@@ -43,6 +80,10 @@ data:
       servlet:
         context-path: /website
 
+    logging:
+      file:
+        name: /var/log/todo-list/${spring.application.name}.log
+
     todo:
       base-url: http://todo-service.todo-service.svc.cluster.local:8080
 ---
@@ -63,10 +104,27 @@ spec:
         app: todo-list-website
     spec:
       volumes:
+        - name: filebeat
+          configMap:
+            name: filebeat-config
+
+        - name: application-logs
+          emptyDir: {}
+
         - name: application-config
           configMap:
             name: todo-list-website
       containers:
+        - name: filebeats
+          image: docker.elastic.co/beats/filebeat:7.6.1
+          volumeMounts:
+            - name: application-logs
+              mountPath: /var/log/todo-list/
+
+            - name: filebeat
+              subPath: filebeat.yml
+              mountPath: /usr/share/filebeat/filebeat.yml
+
         - name: todo-list-website
           image: mrflick72/todo-list-website:latest
           imagePullPolicy: Never
@@ -74,6 +132,9 @@ spec:
             - mountPath: /usr/local/todo-list-website/application.yml
               subPath: application.yml
               name: application-config
+
+            - mountPath: /var/log/todo-list/
+              name: application-logs
 
 ---
 
