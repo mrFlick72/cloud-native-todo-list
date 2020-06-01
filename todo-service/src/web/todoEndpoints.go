@@ -1,6 +1,7 @@
 package web
 
 import (
+	"githab/mrflick72/cloud-native-todo-list/todo-service/src/logging"
 	"githab/mrflick72/cloud-native-todo-list/todo-service/src/model"
 	"github.com/labstack/echo"
 	"net/http"
@@ -32,18 +33,22 @@ func (endpoints *TodoEndpoints) GetOneTodoEndpoint(c echo.Context) error {
 	err = manageErrorFor(err, c)
 
 	err = c.JSON(http.StatusOK, fromDomainToRepresentation(todo))
+	logging.LogErrorFor(err)
+
 	return err
 }
 
 func (endpoints *TodoEndpoints) SaveTodoEndpoint(c echo.Context) error {
 	todoRepresentation := new(todoRepresentation)
 	if err := c.Bind(todoRepresentation); err != nil {
+		logging.LogErrorFor(err)
 		return err
 	}
 
 	err := endpoints.TodoRepository.SaveTodo(fromRepresentationToDomain(todoRepresentation))
 
 	if err != nil {
+		logging.LogErrorFor(err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 	return c.NoContent(http.StatusCreated)
@@ -54,6 +59,7 @@ func (endpoints *TodoEndpoints) DeleteTodoEndpoint(c echo.Context) error {
 	err := endpoints.TodoRepository.RemoveTodo(id)
 
 	if err != nil {
+		logging.LogErrorFor(err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 	return c.NoContent(http.StatusNoContent)
@@ -61,6 +67,7 @@ func (endpoints *TodoEndpoints) DeleteTodoEndpoint(c echo.Context) error {
 
 func manageErrorFor(err error, c echo.Context) error {
 	if err != nil {
+		logging.LogErrorFor(err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 	return nil

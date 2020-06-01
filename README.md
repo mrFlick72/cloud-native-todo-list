@@ -53,9 +53,9 @@ are...... user secret.
 
 ## Istio goodies
 Now that the app is up and running in order to explore the power of istio even with only envoy proxy in place you can type the command:
-```istioctl dasboard grafana```
-```istioctl dasboard kiali```
-```istioctl dasboard jaeger```
+```istioctl dashboard grafana```
+```istioctl dashboard kiali```
+```istioctl dashboard jaeger```
 and automatically you can start to explore:
 * On grafana how so many metrics out of the box you can leverage by the platform
 * On jaeger how even without the powerful spring cloud sleuth used on the website, you can leverage of distributed tracing spanned from teh website to the service written in GO 
