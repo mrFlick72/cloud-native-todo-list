@@ -2,11 +2,22 @@ package logging
 
 import (
 	"go.uber.org/zap"
+	"os"
 )
 
 var (
-	logger, _ = zap.NewProduction()
+	logger, _ = loggerConfigurer().Build()
 )
+
+func loggerConfigurer() zap.Config {
+	cfg := zap.NewProductionConfig()
+	cfg.OutputPaths = []string{os.Getenv("LOGGING_FILE_NAME")}
+
+	file, _ := os.Create(os.Getenv("LOGGING_FILE_NAME"))
+	defer file.Close()
+
+	return cfg
+}
 
 func Logger() *zap.Logger {
 	return logger

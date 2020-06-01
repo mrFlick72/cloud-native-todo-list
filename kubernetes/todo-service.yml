@@ -16,8 +16,20 @@ stringData:
 
 ---
 
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: todo-service-config
+  namespace: todo-service
+data:
+  WEB_SERVER_PORT: "8080"
+  DATABASE_URL:  "mysql.infrastructure.svc.cluster.local"
+  LOGGING_FILE_NAME:  "/var/log/todo-list"
+
+---
+
 apiVersion: apps/v1
-kind: Deployment  
+kind: Deployment
 metadata:
   name: todo-service
   namespace: todo-service
@@ -32,6 +44,9 @@ spec:
         app: todo-service
     spec:
       volumes:
+        - name: application-logs
+          emptyDir: {}
+
         - name: application-config
           configMap:
             name: todo-service
@@ -41,12 +56,13 @@ spec:
           imagePullPolicy: Never
           ports:
             - containerPort: 8080
-          env:
-            - name: WEB_SERVER_PORT
-              value: "8080"
-            - name: DATABASE_URL
-              value: "mysql.infrastructure.svc.cluster.local"
+          volumeMounts:
+            - mountPath: /var/log/todo-list/
+              name: application-logs
+
           envFrom:
+            - configMapRef:
+                name: todo-service-config
             - secretRef:
                 name: todo-service
 

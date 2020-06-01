@@ -2,6 +2,7 @@ package adapter
 
 import (
 	"database/sql"
+	"errors"
 	"githab/mrflick72/cloud-native-todo-list/todo-service/src/logging"
 	"githab/mrflick72/cloud-native-todo-list/todo-service/src/model"
 	_ "github.com/go-sql-driver/mysql"
@@ -29,7 +30,7 @@ func (repository *MySqlTodoRepository) GetAllTodo(userName string) ([]*model.Tod
 }
 
 func (repository *MySqlTodoRepository) GetTodo(id string) (*model.Todo, error) {
-	var result []*model.Todo
+	var selectAll []*model.Todo
 
 	database, err := openConnectionFor(repository)
 	errorLog(err)
@@ -38,11 +39,15 @@ func (repository *MySqlTodoRepository) GetTodo(id string) (*model.Todo, error) {
 	rows, err := query.Query(id)
 	errorLog(err)
 
-	result = buildTodos(rows, result)
+	selectAll = buildTodos(rows, selectAll)
 
 	closeResources(rows, query, database)
+	if selectAll != nil && len(selectAll) > 0 {
+		return selectAll[0], err
+	} else {
+		return nil, errors.New("todo with id " + id + " not found")
+	}
 
-	return result[0], err
 }
 
 func (repository *MySqlTodoRepository) SaveTodo(todo *model.Todo) error {
