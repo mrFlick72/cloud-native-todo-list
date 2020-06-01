@@ -133,6 +133,9 @@ spec:
               subPath: application.yml
               name: application-config
 
+            - mountPath: /var/log/todo-list/
+              name: application-logs
+
 ---
 
 apiVersion: v1
