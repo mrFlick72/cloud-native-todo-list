@@ -45,7 +45,7 @@ metadata:
   namespace: todo-list-website
 data:
   application.yml: |-
-    localhost.url: http://192.168.99.101
+    localhost.url: http://${MINIKUBE_IP}
 
     spring:
       application:
