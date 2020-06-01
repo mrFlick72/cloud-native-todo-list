@@ -12,13 +12,13 @@ metadata:
   namespace: infrastructure
 spec:
   capacity:
-    storage: 5Gi
+    storage: 2Gi
   volumeMode: Filesystem
   storageClassName: database
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: /mnt/data
+    path: /mnt/data/mysql
 
 ---
 
@@ -34,7 +34,7 @@ spec:
     - ReadWriteMany
   resources:
     requests:
-      storage: 5Gi
+      storage: 2Gi
 
 ---
 
