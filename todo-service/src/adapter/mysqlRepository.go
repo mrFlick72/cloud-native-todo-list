@@ -16,8 +16,7 @@ type MySqlTodoRepository struct {
 func (repository *MySqlTodoRepository) GetAllTodo(userName string) ([]*model.Todo, error) {
 	result := []*model.Todo{}
 
-	database, err := openConnectionFor(repository)
-	errorLog(err)
+	database, err := getDatabaseConnectionFor(repository)
 
 	query, _ := database.Prepare("SELECT id, user_name as username, date, content FROM TODO where user_name = ?")
 	rows, err := query.Query(userName)
@@ -32,8 +31,7 @@ func (repository *MySqlTodoRepository) GetAllTodo(userName string) ([]*model.Tod
 func (repository *MySqlTodoRepository) GetTodo(id string) (*model.Todo, error) {
 	var selectAll []*model.Todo
 
-	database, err := openConnectionFor(repository)
-	errorLog(err)
+	database, err := getDatabaseConnectionFor(repository)
 
 	query, _ := database.Prepare("SELECT id, user_name as username, date, content FROM TODO WHERE ID=?")
 	rows, err := query.Query(id)
@@ -45,14 +43,15 @@ func (repository *MySqlTodoRepository) GetTodo(id string) (*model.Todo, error) {
 	if selectAll != nil && len(selectAll) > 0 {
 		return selectAll[0], err
 	} else {
-		return nil, errors.New("todo with id " + id + " not found")
+		err := errors.New("todo with id " + id + " not found")
+		errorLog(err)
+		return nil, err
 	}
 
 }
 
 func (repository *MySqlTodoRepository) SaveTodo(todo *model.Todo) error {
-	database, err := openConnectionFor(repository)
-	errorLog(err)
+	database, err := getDatabaseConnectionFor(repository)
 
 	query, _ := database.Prepare("INSERT into TODO (id, user_name, date, content) VALUES (?, ?, ?, ?)")
 	rows, err := query.Query(todo.Id, todo.UserName, todo.Date, todo.Content)
@@ -64,8 +63,7 @@ func (repository *MySqlTodoRepository) SaveTodo(todo *model.Todo) error {
 }
 
 func (repository *MySqlTodoRepository) RemoveTodo(id string) error {
-	database, err := openConnectionFor(repository)
-	errorLog(err)
+	database, err := getDatabaseConnectionFor(repository)
 
 	query, _ := database.Prepare("DELETE FROM TODO WHERE id=?")
 	rows, err := query.Query(id)
@@ -101,6 +99,12 @@ func buildTodos(rows *sql.Rows, result []*model.Todo) []*model.Todo {
 		})
 	}
 	return result
+}
+
+func getDatabaseConnectionFor(repository *MySqlTodoRepository) (*sql.DB, error) {
+	database, err := openConnectionFor(repository)
+	errorLog(err)
+	return database, err
 }
 
 func errorLog(err error) {

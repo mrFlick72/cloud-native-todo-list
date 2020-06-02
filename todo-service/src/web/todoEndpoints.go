@@ -32,12 +32,19 @@ func (endpoints *TodoEndpoints) GetOneTodoEndpoint(c echo.Context) error {
 	todo, err := endpoints.TodoRepository.GetTodo(id)
 	manageErrorFor(err, c)
 
-	if err != nil {
-		err = c.JSON(http.StatusOK, fromDomainToRepresentation(todo))
-		logging.LogErrorFor(err)
+	if noErrorFor(err) {
+		if todo != nil {
+			err = c.JSON(http.StatusOK, fromDomainToRepresentation(todo))
+		} else {
+			err = c.NoContent(http.StatusNotFound)
+		}
 	}
 
 	return err
+}
+
+func noErrorFor(err error) bool {
+	return err == nil
 }
 
 func (endpoints *TodoEndpoints) SaveTodoEndpoint(c echo.Context) error {
