@@ -28,10 +28,24 @@ func TestMySqlTodoRepository_GetTodo(t *testing.T) {
 	assertThatNoErrorFor(t, err, "some errors occurs during the insert query")
 
 	actual, err := repository.GetTodo(expected.Id)
+	t.Log("actual ", actual)
 	assertThatNoErrorFor(t, err, "some errors occurs during the find one query")
 
 	if expected != *actual {
-		fmt.Println("expected ", expected)
+		t.Log("expected ", expected)
+		t.Log("actual ", actual)
+		t.Error("the retrieved todo is not wat we expect")
+	}
+
+	clearDatabase()
+}
+
+func TestMySqlTodoRepository_GetTodoNotFound(t *testing.T) {
+	actual, err := repository.GetTodo("123456789987")
+	fmt.Println("actual ", actual)
+	assertThatNoErrorFor(t, err, "some errors occurs during the find one query")
+
+	if actual != nil {
 		fmt.Println("actual ", actual)
 		t.Error("the retrieved todo is not wat we expect")
 	}
@@ -93,7 +107,7 @@ func clearDatabase() {
 
 func assertThatNoErrorFor(t *testing.T, err error, errorMessage string) {
 	if err != nil {
-		t.Error(errorMessage)
+		t.Log(errorMessage)
 	}
 }
 

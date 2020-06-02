@@ -20,22 +20,38 @@ type TodoEndpoints struct {
 func (endpoints *TodoEndpoints) GetTodoEndpoint(c echo.Context) error {
 	userNameParameter := c.QueryParam("username")
 	allTodo, err := endpoints.TodoRepository.GetAllTodo(userNameParameter)
-	err = manageErrorFor(err, c)
 
-	todoRepresentation := fromDomainToRepresentationForAllTodoInList(allTodo)
-	err = c.JSON(http.StatusOK, &todoRepresentation)
+	if noErrorFor(err) {
+		todoRepresentation := fromDomainToRepresentationForAllTodoInList(allTodo)
+		err = c.JSON(http.StatusOK, &todoRepresentation)
+	}
+
 	return err
 }
 
 func (endpoints *TodoEndpoints) GetOneTodoEndpoint(c echo.Context) error {
 	id := c.Param("id")
 	todo, err := endpoints.TodoRepository.GetTodo(id)
-	err = manageErrorFor(err, c)
 
-	err = c.JSON(http.StatusOK, fromDomainToRepresentation(todo))
-	logging.LogErrorFor(err)
+	if foundAtodo(err, todo) {
+		err = c.JSON(http.StatusOK, fromDomainToRepresentation(todo))
+	} else if notFoundAtodo(err, todo) {
+		err = c.NoContent(http.StatusNotFound)
+	}
 
 	return err
+}
+
+func noErrorFor(err error) bool {
+	return err == nil
+}
+
+func foundAtodo(err error, todo *model.Todo) bool {
+	return err == nil && todo != nil
+}
+
+func notFoundAtodo(err error, todo *model.Todo) bool {
+	return err != nil && todo == nil
 }
 
 func (endpoints *TodoEndpoints) SaveTodoEndpoint(c echo.Context) error {
@@ -65,12 +81,11 @@ func (endpoints *TodoEndpoints) DeleteTodoEndpoint(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-func manageErrorFor(err error, c echo.Context) error {
+func manageErrorFor(err error, c echo.Context) {
 	if err != nil {
 		logging.LogErrorFor(err)
-		return c.NoContent(http.StatusInternalServerError)
+		c.NoContent(http.StatusInternalServerError)
 	}
-	return nil
 }
 
 func fromDomainToRepresentationForAllTodoInList(allTodo []*model.Todo) []todoRepresentation {

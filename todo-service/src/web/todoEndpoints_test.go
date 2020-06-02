@@ -1,6 +1,7 @@
 package web
 
 import (
+	"database/sql"
 	"encoding/json"
 	"githab/mrflick72/cloud-native-todo-list/todo-service/src/adapter"
 	"githab/mrflick72/cloud-native-todo-list/todo-service/src/model"
@@ -13,11 +14,13 @@ import (
 )
 
 var (
-	userName = "user-name"
+	userName         = "user-name"
+	connectionString = "root:root@tcp(localhost)/todo?parseTime=true"
+	repository       = adapter.MySqlTodoRepository{ConnectionString: connectionString}
 )
 
 func TestGetAllTodo(t *testing.T) {
-	repository := adapter.InMemoryTodoRepository{}
+	clearDatabase()
 	initDatabase(&repository)
 	e := echo.New()
 
@@ -36,8 +39,9 @@ func TestGetAllTodo(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rec.Code)
 	assert.Equal(t, string(expected), actual)
 }
+
 func TestGetAllTodoWhenTodoIsEmpty(t *testing.T) {
-	repository := adapter.InMemoryTodoRepository{Database: []*model.Todo{}}
+	clearDatabase()
 	e := echo.New()
 
 	req := httptest.NewRequest(http.MethodGet, "/todo", nil)
@@ -55,24 +59,10 @@ func TestGetAllTodoWhenTodoIsEmpty(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rec.Code)
 	assert.Equal(t, string(expected), actual)
 }
-func TestGetAllTodoWhenRepositoryGoesInError(t *testing.T) {
-	e := echo.New()
-
-	req := httptest.NewRequest(http.MethodGet, "/todo", nil)
-	rec := httptest.NewRecorder()
-
-	c := e.NewContext(req, rec)
-	c.SetPath("/todo")
-
-	endpoint := TodoEndpoints{TodoRepository: &adapter.InMemoryTodoRepository{Database: nil}}
-	endpoint.GetTodoEndpoint(c)
-
-	assert.Equal(t, http.StatusInternalServerError, rec.Code)
-}
 
 func TestGetOneTodo(t *testing.T) {
-	repository := &adapter.InMemoryTodoRepository{}
-	initDatabase(repository)
+	clearDatabase()
+	initDatabase(&repository)
 	e := echo.New()
 
 	req := httptest.NewRequest(http.MethodGet, "/todo/1", nil)
@@ -83,7 +73,7 @@ func TestGetOneTodo(t *testing.T) {
 	c.SetParamNames("id")
 	c.SetParamValues("1")
 
-	endpoint := TodoEndpoints{TodoRepository: repository}
+	endpoint := TodoEndpoints{TodoRepository: &repository}
 	endpoint.GetOneTodoEndpoint(c)
 
 	expected, _ := json.Marshal(fromDomainToRepresentation(aNewTodo()))
@@ -93,8 +83,26 @@ func TestGetOneTodo(t *testing.T) {
 	assert.Equal(t, string(expected), actual)
 }
 
+func TestWhenGetOneTodoIsEmpty(t *testing.T) {
+	clearDatabase()
+	e := echo.New()
+
+	req := httptest.NewRequest(http.MethodGet, "/todo/1", nil)
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+	c.SetPath("/todo/:id")
+	c.SetParamNames("id")
+	c.SetParamValues("1")
+
+	endpoint := TodoEndpoints{TodoRepository: &repository}
+	endpoint.GetOneTodoEndpoint(c)
+
+	assert.Equal(t, http.StatusNotFound, rec.Code)
+}
+
 func TestTodoEndpoints_SaveTodoEndpoint(t *testing.T) {
-	repository := adapter.InMemoryTodoRepository{}
+	clearDatabase()
 	initDatabase(&repository)
 	e := echo.New()
 
@@ -117,7 +125,7 @@ func TestTodoEndpoints_SaveTodoEndpoint(t *testing.T) {
 }
 
 func TestTodoEndpoints_DeleteTodoEndpoint(t *testing.T) {
-	repository := adapter.InMemoryTodoRepository{}
+	clearDatabase()
 	initDatabase(&repository)
 	e := echo.New()
 
@@ -137,10 +145,6 @@ func TestTodoEndpoints_DeleteTodoEndpoint(t *testing.T) {
 	assert.Equal(t, http.StatusCreated, rec.Code)
 }
 
-func initDatabase(repository *adapter.InMemoryTodoRepository) {
-	repository.SaveTodo(aNewTodo())
-}
-
 func aNewTodo() *model.Todo {
 	return &model.Todo{
 		Id:       "1",
@@ -148,4 +152,13 @@ func aNewTodo() *model.Todo {
 		Date:     model.Now(),
 		Content:  "a content",
 	}
+}
+
+func initDatabase(repository model.TodoRepository) {
+	repository.SaveTodo(aNewTodo())
+}
+
+func clearDatabase() {
+	open, _ := sql.Open("mysql", connectionString)
+	open.Exec("truncate table TODO")
 }
