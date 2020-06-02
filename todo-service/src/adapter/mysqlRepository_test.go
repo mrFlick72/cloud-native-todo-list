@@ -28,12 +28,12 @@ func TestMySqlTodoRepository_GetTodo(t *testing.T) {
 	assertThatNoErrorFor(t, err, "some errors occurs during the insert query")
 
 	actual, err := repository.GetTodo(expected.Id)
-	fmt.Println("actual ", actual)
+	t.Log("actual ", actual)
 	assertThatNoErrorFor(t, err, "some errors occurs during the find one query")
 
 	if expected != *actual {
-		fmt.Println("expected ", expected)
-		fmt.Println("actual ", actual)
+		t.Log("expected ", expected)
+		t.Log("actual ", actual)
 		t.Error("the retrieved todo is not wat we expect")
 	}
 

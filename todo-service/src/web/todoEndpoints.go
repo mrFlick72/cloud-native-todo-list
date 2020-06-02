@@ -22,8 +22,11 @@ func (endpoints *TodoEndpoints) GetTodoEndpoint(c echo.Context) error {
 	allTodo, err := endpoints.TodoRepository.GetAllTodo(userNameParameter)
 	manageErrorFor(err, c)
 
-	todoRepresentation := fromDomainToRepresentationForAllTodoInList(allTodo)
-	err = c.JSON(http.StatusOK, &todoRepresentation)
+	if noErrorFor(err) {
+		todoRepresentation := fromDomainToRepresentationForAllTodoInList(allTodo)
+		err = c.JSON(http.StatusOK, &todoRepresentation)
+	}
+
 	return err
 }
 
