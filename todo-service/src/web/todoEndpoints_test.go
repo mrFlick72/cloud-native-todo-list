@@ -60,22 +60,6 @@ func TestGetAllTodoWhenTodoIsEmpty(t *testing.T) {
 	assert.Equal(t, string(expected), actual)
 }
 
-func TestGetAllTodoWhenRepositoryGoesInError(t *testing.T) {
-	clearDatabase()
-	e := echo.New()
-
-	req := httptest.NewRequest(http.MethodGet, "/todo", nil)
-	rec := httptest.NewRecorder()
-
-	c := e.NewContext(req, rec)
-	c.SetPath("/todo")
-
-	endpoint := TodoEndpoints{TodoRepository: &adapter.InMemoryTodoRepository{Database: nil}}
-	endpoint.GetTodoEndpoint(c)
-
-	assert.Equal(t, http.StatusInternalServerError, rec.Code)
-}
-
 func TestGetOneTodo(t *testing.T) {
 	clearDatabase()
 	initDatabase(&repository)
@@ -114,11 +98,7 @@ func TestWhenGetOneTodoIsEmpty(t *testing.T) {
 	endpoint := TodoEndpoints{TodoRepository: &repository}
 	endpoint.GetOneTodoEndpoint(c)
 
-	expected, _ := json.Marshal(fromDomainToRepresentation(aNewTodo()))
-	actual := strings.Trim(rec.Body.String(), "\n")
-
 	assert.Equal(t, http.StatusNotFound, rec.Code)
-	assert.Equal(t, string(expected), actual)
 }
 
 func TestTodoEndpoints_SaveTodoEndpoint(t *testing.T) {
