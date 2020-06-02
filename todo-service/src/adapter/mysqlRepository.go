@@ -21,9 +21,9 @@ func (repository *MySqlTodoRepository) GetAllTodo(userName string) ([]*model.Tod
 	query, _ := database.Prepare("SELECT id, user_name as username, date, content FROM TODO where user_name = ?")
 	rows, err := query.Query(userName)
 	errorLog(err)
-	closeResources(rows, query, database)
 	result = buildTodos(rows, result)
 
+	closeResources(rows, query, database)
 	return result, err
 }
 
@@ -35,9 +35,10 @@ func (repository *MySqlTodoRepository) GetTodo(id string) (*model.Todo, error) {
 	query, _ := database.Prepare("SELECT id, user_name as username, date, content FROM TODO WHERE ID=?")
 	rows, err := query.Query(id)
 	errorLog(err)
-	closeResources(rows, query, database)
 
 	selectAll = buildTodos(rows, selectAll)
+
+	closeResources(rows, query, database)
 
 	if selectAll != nil && len(selectAll) > 0 {
 		return selectAll[0], err
