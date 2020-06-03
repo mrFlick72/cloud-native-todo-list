@@ -28,6 +28,10 @@ data:
           - /var/log/todo-list/*.log
 
     processors:
+      - add_fields:
+           target: application
+           fields:
+             name: todo-list-website
       - add_cloud_metadata: ~
       - add_docker_metadata: ~
 

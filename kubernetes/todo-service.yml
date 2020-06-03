@@ -42,15 +42,20 @@ data:
 
     filebeat.inputs:
       - type: log
-        multiline.pattern: '^java.|^[[:space:]]+(at|\.{3})\b|^Caused by:|^END:'
-        multiline.negate: false
-        multiline.match: after
+        json.keys_under_root: true
+        json.add_error_key: true
+        json.message_key: msg
+
 
         enabled: true
         paths:
           - /var/log/todo-list/*.log
 
     processors:
+      - add_fields:
+           target: application
+           fields:
+             name: todo-service
       - add_cloud_metadata: ~
       - add_docker_metadata: ~
 
