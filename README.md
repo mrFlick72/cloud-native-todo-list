@@ -28,12 +28,6 @@ mvn clean install of todo-list-website copy the Dockerfile under todo-list-websi
 in todo-list-website/target and fire the command ```docker build --tag mrflick72/todo-list-website:latest .```
 
 move in todo-service folder and fire the follow command ```docker build --tag mrflick72/todo-service:latest .```
-
-## persistance storage directory
-In order to benefit of persistance volume you have to connect via ssh to your kubernetes nodes, if you are using minikube 
-you can type this command ```minikube ssh -p istio```. After this command you are connected to minikube, now you can create your 
-directory, type command ```sudo mkdir -p /mnt/data/mysql``` in order to have hte mysql directory, then type command 
-```sudo mkdir -m 777 -p /mnt/data/log/elastic``` 
  
 ## inject envoy proxy for istio
 in order to deploy all k8s yaml instrumented by istio execute the follow commands
