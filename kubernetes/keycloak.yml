@@ -5,6 +5,44 @@ metadata:
   name: idp
 
 ---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filebeat-config
+  namespace: idp
+data:
+  filebeat.yml: |-
+    filebeat.config:
+      modules:
+        path: ${path.config}/modules.d/*.yml
+        reload.enabled: true
+
+    filebeat.inputs:
+      - type: log
+        multiline.pattern: '^java.|^[[:space:]]+(at|\.{3})\b|^Caused by:|^END:'
+        multiline.negate: false
+        multiline.match: after
+
+        enabled: true
+        paths:
+          - /opt/jboss/keycloak/standalone/log/*.log
+
+    processors:
+      - add_fields:
+           target: application
+           fields:
+             name: keycloak
+      - add_cloud_metadata: ~
+      - add_docker_metadata: ~
+
+    setup.kibana:
+      host: "kibana.monitoring.svc.cluster.local:5601"
+
+    output.elasticsearch:
+      hosts: ['elasticsearch.monitoring.svc.cluster.local:9200']
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -19,11 +57,32 @@ spec:
       labels:
         app: keycloak
     spec:
+      volumes:
+        - name: filebeat
+          configMap:
+            name: filebeat-config
+
+        - name: application-logs
+          emptyDir: {}
+
       containers:
+        - name: filebeats
+          image: docker.elastic.co/beats/filebeat:7.6.1
+          volumeMounts:
+            - name: application-logs
+              mountPath: /opt/jboss/keycloak/standalone/log/
+
+            - name: filebeat
+              subPath: filebeat.yml
+              mountPath: /usr/share/filebeat/filebeat.yml
+
         - name: keyclok
           image: jboss/keycloak
           ports:
             - containerPort: 8080
+          volumeMounts:
+            - name: application-logs
+              mountPath: /opt/jboss/keycloak/standalone/log/
           env:
             - name: DB_ADDR
               value: "mysql.infrastructure.svc.cluster.local"
