@@ -84,14 +84,14 @@ spec:
           volumeMounts:
             - mountPath: /docker-entrypoint-initdb.d
               name: dump
-        - name: keycloak-schema-init
-          image: mwendler/wget
+        - name: keycloak-schema-init1
+          image: centos
           command: [
             'sh',
             '-c'
           ]
           args:
-            - 'wget --no-check-certificate -qO - https://raw.githubusercontent.com/mrFlick72/cloud-native-todo-list/master/docker/database/keycloak.tgz && tar xvz && cat /docker-entrypoint-initdb.d/keycloak.sql >> /docker-entrypoint-initdb.d/build.sql && rm /docker-entrypoint-initdb.d/keycloak.sql'
+            - 'curl -o keycloak.tgz https://raw.githubusercontent.com/mrFlick72/cloud-native-todo-list/master/docker/database/keycloak.tgz && tar xvfz keycloak.tgz && cat keycloak.sql >> /docker-entrypoint-initdb.d/build.sql && rm -f keycloak.sql'
           volumeMounts:
             - mountPath: /docker-entrypoint-initdb.d
               name: dump
