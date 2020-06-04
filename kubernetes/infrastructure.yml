@@ -63,28 +63,28 @@ spec:
 
       initContainers:
         - name: schema-init
-          image: mwendler/wget
+          image: centos
           command: [
             'sh',
             '-c'
           ]
           args:
-            - 'wget --no-check-certificate  -O - https://raw.githubusercontent.com/mrFlick72/cloud-native-todo-list/master/docker/database/schema.sql >> /docker-entrypoint-initdb.d/build.sql && echo -en "\n" >> /docker-entrypoint-initdb.d/build.sql'
+            - 'curl https://raw.githubusercontent.com/mrFlick72/cloud-native-todo-list/master/docker/database/schema.sql >> /docker-entrypoint-initdb.d/build.sql && echo -en "\n" >> /docker-entrypoint-initdb.d/build.sql'
           volumeMounts:
             - mountPath: /docker-entrypoint-initdb.d
               name: dump
         - name: todo-schema-init
-          image: mwendler/wget
+          image: centos
           command: [
             'sh',
             '-c'
           ]
           args:
-            - 'wget --no-check-certificate -O - https://raw.githubusercontent.com/mrFlick72/cloud-native-todo-list/master/docker/database/todo.sql >> /docker-entrypoint-initdb.d/build.sql && echo -en "\n" >> /docker-entrypoint-initdb.d/build.sql'
+            - 'curl https://raw.githubusercontent.com/mrFlick72/cloud-native-todo-list/master/docker/database/todo.sql >> /docker-entrypoint-initdb.d/build.sql && echo -en "\n" >> /docker-entrypoint-initdb.d/build.sql'
           volumeMounts:
             - mountPath: /docker-entrypoint-initdb.d
               name: dump
-        - name: keycloak-schema-init1
+        - name: keycloak-schema-init
           image: centos
           command: [
             'sh',

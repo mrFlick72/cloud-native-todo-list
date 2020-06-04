@@ -76,7 +76,7 @@ spec:
               subPath: filebeat.yml
               mountPath: /usr/share/filebeat/filebeat.yml
 
-        - name: keyclok
+        - name: keycloak
           image: jboss/keycloak
           ports:
             - containerPort: 8080
