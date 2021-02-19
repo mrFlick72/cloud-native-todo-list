@@ -1,9 +1,9 @@
-package adapter
+package todo
 
 import (
-	sql "database/sql"
+	"database/sql"
 	"fmt"
-	"githab/mrflick72/cloud-native-todo-list/todo-service/src/model"
+	"githab/mrflick72/cloud-native-todo-list/todo-service/src/internal/clock"
 	"github.com/google/uuid"
 	"sort"
 	"testing"
@@ -78,7 +78,7 @@ func TestMySqlTodoRepository_RemoveTodo(t *testing.T) {
 	repository.SaveTodo(&aTodo)
 	repository.SaveTodo(&anotherTodo)
 
-	expected := []model.Todo{aTodo}
+	expected := []Todo{aTodo}
 
 	sort.Slice(expected, func(p, q int) bool {
 		return expected[p].Id < expected[q].Id
@@ -92,7 +92,7 @@ func TestMySqlTodoRepository_RemoveTodo(t *testing.T) {
 	clearDatabase()
 }
 
-func assertEqualityFor(t *testing.T, expected model.Todo, actual *model.Todo) {
+func assertEqualityFor(t *testing.T, expected Todo, actual *Todo) {
 	if expected != *actual {
 		t.Error("expected: ", expected)
 		t.Error("actual: ", actual)
@@ -111,17 +111,17 @@ func assertThatNoErrorFor(t *testing.T, err error, errorMessage string) {
 	}
 }
 
-func aNewTodo() model.Todo {
+func aNewTodo() Todo {
 	random, _ := uuid.NewRandom()
-	return model.Todo{
+	return Todo{
 		Id:       random.String(),
 		Content:  "it is a todo",
 		UserName: "user-name",
-		Date:     model.ToDay(),
+		Date:     clock.ToDay(),
 	}
 }
-func orderedTodoListById(aTodo model.Todo, anotherTodo model.Todo) []model.Todo {
-	expected := []model.Todo{aTodo, anotherTodo}
+func orderedTodoListById(aTodo Todo, anotherTodo Todo) []Todo {
+	expected := []Todo{aTodo, anotherTodo}
 	sort.Slice(expected, func(p, q int) bool {
 		return expected[p].Id < expected[q].Id
 	})

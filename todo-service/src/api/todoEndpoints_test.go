@@ -1,10 +1,10 @@
-package web
+package api
 
 import (
 	"database/sql"
 	"encoding/json"
-	"githab/mrflick72/cloud-native-todo-list/todo-service/src/adapter"
-	"githab/mrflick72/cloud-native-todo-list/todo-service/src/model"
+	"githab/mrflick72/cloud-native-todo-list/todo-service/src/internal/clock"
+	"githab/mrflick72/cloud-native-todo-list/todo-service/src/internal/todo"
 	"github.com/labstack/echo"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -16,7 +16,7 @@ import (
 var (
 	userName         = "user-name"
 	connectionString = "root:root@tcp(localhost)/todo?parseTime=true"
-	repository       = adapter.MySqlTodoRepository{ConnectionString: connectionString}
+	repository       = todo.MySqlTodoRepository{ConnectionString: connectionString}
 )
 
 func TestGetAllTodo(t *testing.T) {
@@ -145,16 +145,16 @@ func TestTodoEndpoints_DeleteTodoEndpoint(t *testing.T) {
 	assert.Equal(t, http.StatusCreated, rec.Code)
 }
 
-func aNewTodo() *model.Todo {
-	return &model.Todo{
+func aNewTodo() *todo.Todo {
+	return &todo.Todo{
 		Id:       "1",
 		UserName: "valerio.vaudi",
-		Date:     model.Now(),
+		Date:     clock.Now(),
 		Content:  "a content",
 	}
 }
 
-func initDatabase(repository model.TodoRepository) {
+func initDatabase(repository todo.TodoRepository) {
 	repository.SaveTodo(aNewTodo())
 }
 

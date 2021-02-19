@@ -1,6 +1,6 @@
 module githab/mrflick72/cloud-native-todo-list/todo-service
 
-go 1.14
+go 1.15
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect

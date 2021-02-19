@@ -1,4 +1,4 @@
-FROM golang:1.14.3
+FROM golang:1.15.8
 
 VOLUME /var/log/todo-list
 WORKDIR /go/src/app

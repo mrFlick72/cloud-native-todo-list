@@ -1,8 +1,9 @@
-package web
+package api
 
 import (
-	"githab/mrflick72/cloud-native-todo-list/todo-service/src/logging"
-	"githab/mrflick72/cloud-native-todo-list/todo-service/src/model"
+	"githab/mrflick72/cloud-native-todo-list/todo-service/src/internal/clock"
+	"githab/mrflick72/cloud-native-todo-list/todo-service/src/internal/logging"
+	"githab/mrflick72/cloud-native-todo-list/todo-service/src/internal/todo"
 	"github.com/labstack/echo"
 	"net/http"
 )
@@ -14,7 +15,7 @@ type todoRepresentation struct {
 	Content  string `json:"content"`
 }
 type TodoEndpoints struct {
-	TodoRepository model.TodoRepository
+	TodoRepository todo.TodoRepository
 }
 
 func (endpoints *TodoEndpoints) GetTodoEndpoint(c echo.Context) error {
@@ -46,11 +47,11 @@ func noErrorFor(err error) bool {
 	return err == nil
 }
 
-func foundAtodo(err error, todo *model.Todo) bool {
+func foundAtodo(err error, todo *todo.Todo) bool {
 	return err == nil && todo != nil
 }
 
-func notFoundAtodo(err error, todo *model.Todo) bool {
+func notFoundAtodo(err error, todo *todo.Todo) bool {
 	return err != nil && todo == nil
 }
 
@@ -88,7 +89,7 @@ func manageErrorFor(err error, c echo.Context) {
 	}
 }
 
-func fromDomainToRepresentationForAllTodoInList(allTodo []*model.Todo) []todoRepresentation {
+func fromDomainToRepresentationForAllTodoInList(allTodo []*todo.Todo) []todoRepresentation {
 	todoRepresentation := []todoRepresentation{}
 	for _, todo := range allTodo {
 		todoRepresentation = append(todoRepresentation, fromDomainToRepresentation(todo))
@@ -96,19 +97,19 @@ func fromDomainToRepresentationForAllTodoInList(allTodo []*model.Todo) []todoRep
 	return todoRepresentation
 }
 
-func fromDomainToRepresentation(todo *model.Todo) todoRepresentation {
+func fromDomainToRepresentation(todo *todo.Todo) todoRepresentation {
 	return todoRepresentation{
 		Id:       todo.Id,
 		UserName: todo.UserName,
-		Date:     model.FormatDateFor(todo.Date),
+		Date:     clock.FormatDateFor(todo.Date),
 		Content:  todo.Content,
 	}
 }
-func fromRepresentationToDomain(representation *todoRepresentation) *model.Todo {
-	return &model.Todo{
+func fromRepresentationToDomain(representation *todoRepresentation) *todo.Todo {
+	return &todo.Todo{
 		Id:       representation.Id,
 		UserName: representation.UserName,
-		Date:     model.ParseDateFor(representation.Date),
+		Date:     clock.ParseDateFor(representation.Date),
 		Content:  representation.Content,
 	}
 }
