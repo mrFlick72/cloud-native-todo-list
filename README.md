@@ -17,7 +17,7 @@ First of all you need fo three things: kubernetes, istio and an envoy proxy for 
     * on linux: ```curl -L https://istio.io/downloadIstio | sh -``` otherwise checkout the [official page](https://istio.io/docs/setup/getting-started/#download) and follow the instructions
     * un package the tar
     * Put ```export PATH=$PWD/bin:$PATH``` in your permanent environment
-    * type teh command ```istioctl manifest apply --set profile=demo```
+    * type the command ```istioctl install --set profile=demo -y``
 
 ## build local image eligible to minikube
 Pushing directly to the in-cluster Docker daemon (docker-env) [for more information](https://minikube.sigs.k8s.io/docs/handbook/pushing/#5-building-images-inside-of-minikube-using-ssh) 
