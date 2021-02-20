@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 )
 
 func redirectUrlPath() string {
@@ -126,6 +127,7 @@ func oidcCallbackHandlerFactory(oauth2Config *oauth2.Config, verifier *oidc.IDTo
 			AccessToken:  oauth2Token.AccessToken,
 			RefreshToken: oauth2Token.RefreshToken,
 			IdToken:      rawIDToken,
+			Expire:       oauth2Token.Expiry,
 			Authorities:  make([]string, 0),
 		})
 		ctx.Redirect(session.GetString("request_url"))
@@ -140,9 +142,10 @@ type OidcUser struct {
 	AccessToken  string
 	RefreshToken string
 	IdToken      string
+	Expire       time.Time
 	Authorities  []string
 }
 
 func (user *OidcUser) IsExpired() bool {
-	return false
+	return time.Now().After(user.Expire)
 }
