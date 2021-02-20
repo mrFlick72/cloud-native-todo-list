@@ -48,17 +48,17 @@ func main() {
 }
 
 func provider() {
-	configURL := "http://localhost:8080/auth/realms/demo"
+	configURL := "http://local.todo-list.com/auth/realms/todo-list"
 	ctx := context.Background()
 	provider, err := oidc.NewProvider(ctx, configURL)
 	if err != nil {
 		panic(err)
 	}
 
-	clientID := "demo-client"
-	clientSecret := "cbfd6e04-a51c-4982-a25b-7aaba4f30c81"
+	clientID := "application"
+	clientSecret := "b047cc08-f324-4bd4-a7fa-31d8ddbc08e6"
 
-	redirectURL := "http://localhost:8181/demo/callback"
+	redirectURL := "http://localhost:8080/demo/callback"
 	// Configure an OpenID Connect aware OAuth2 client.
 	oauth2Config := oauth2.Config{
 		ClientID:     clientID,
