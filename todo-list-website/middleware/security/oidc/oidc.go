@@ -10,13 +10,6 @@ import (
 	"github.com/kataras/iris/v12/sessions"
 	"golang.org/x/oauth2"
 	"net/http"
-	"sync"
-)
-
-var (
-	oidcConfig *oidc.Config
-	verifier   *oidc.IDTokenVerifier
-	once       sync.Once
 )
 
 func stateFactory() string {
@@ -59,6 +52,10 @@ func NewOidcMiddleware(ctx iris.Context) {
 
 	idToken := session.Get("id_token")
 	fmt.Printf("idToken: %v", idToken)
+	if ctx.Path() == "/demo/callback" {
+		ctx.Next()
+	}
+
 	if idToken == nil {
 		state := stateFactory()
 		session := sessions.Get(ctx)
@@ -70,16 +67,20 @@ func NewOidcMiddleware(ctx iris.Context) {
 }
 
 var OidcCallback = func(ctx iris.Context) {
+	fmt.Println("START Callback")
 	background := context.Background()
 	session := sessions.Get(ctx)
-	if ctx.Params().Get("state") != session.GetString("state") {
+
+	fmt.Printf("state from session: %v\n", session.GetString("state"))
+	fmt.Printf("state from uri: %v\n", ctx.URLParam("state"))
+
+	if ctx.URLParam("state") != session.GetString("state") {
 		fmt.Println("state did not match")
 		ctx.StatusCode(http.StatusBadRequest)
 		return
 	}
-
-	_, oauth2Config, _ := oidcProvider()
-	oauth2Token, err := oauth2Config.Exchange(background, ctx.Params().Get("code"))
+	_, oauth2Config, verifier := oidcProvider()
+	oauth2Token, err := oauth2Config.Exchange(background, ctx.URLParam("code"))
 	if err != nil {
 		fmt.Println("Failed to exchange token: " + err.Error())
 		ctx.StatusCode(http.StatusInternalServerError)
@@ -108,8 +109,9 @@ var OidcCallback = func(ctx iris.Context) {
 		ctx.StatusCode(http.StatusInternalServerError)
 		return
 	}
+	data, err := json.MarshalIndent(resp, "", "    ")
 
-	marshalJSON, _ := resp.IDTokenClaims.MarshalJSON()
-	session.Set("id_token", string(marshalJSON))
+	fmt.Println(data)
+	session.Set("id_token", data)
 	ctx.Redirect(session.GetString("request_url"))
 }

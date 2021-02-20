@@ -24,9 +24,8 @@ func main() {
 
 	tmpl := iris.HTML("./views", ".html")
 	app.RegisterView(tmpl)
-	app.Get("/demo/callback", oidc.NewOidcMiddleware)
 
-	app.Get("/", func(ctx iris.Context) {
+	app.Get("/index", func(ctx iris.Context) {
 		session := sessions.Get(ctx)
 		ctx.ViewData("session_lifetime", session.Lifetime)
 		ctx.ViewData("session_isNew", session.IsNew())
@@ -41,6 +40,7 @@ func main() {
 		ctx.ViewData("username", session.GetString("username"))
 		ctx.View("index.html")
 	})
+	app.Get("/demo/callback", oidc.OidcCallback)
 
 	app.Listen(":8080")
 }
