@@ -48,48 +48,12 @@ metadata:
   name: todo-list-website
   namespace: todo-list-website
 data:
-  application.yml: |-
-    localhost.url: http://local.todo-list.com
-
-    spring:
-      application:
-        name: todolist-website
-      sleuth:
-        redis:
-          enabled: false
-      redis:
-        host: redis.infrastructure.svc.cluster.local
-      security:
-        oauth2:
-          client:
-            registration:
-              keycloak:
-                client-id: application
-                client-secret: "b047cc08-f324-4bd4-a7fa-31d8ddbc08e6"
-                clientName: Keycloak
-                authorization-grant-type: authorization_code
-                redirect-uri: ${localhost.url}/website/login/oauth2/code/keycloak
-                scope:
-                  - openid
-                  - profile
-                  - email
-            provider:
-              keycloak:
-                authorization-uri: ${localhost.url}/auth/realms/todo-list/protocol/openid-connect/auth
-                token-uri: ${localhost.url}/auth/realms/todo-list/protocol/openid-connect/token
-                user-info-uri: ${localhost.url}/auth/realms/todo-list/protocol/openid-connect/userinfo
-                jwk-set-uri: ${localhost.url}/auth/realms/todo-list/protocol/openid-connect/certs
-                user-name-attribute: preferred_username
-    server:
-      servlet:
-        context-path: /website
-
-    logging:
-      file:
-        name: /var/log/todo-list/${spring.application.name}.log
-
-    todo:
-      base-url: http://todo-service.todo-service.svc.cluster.local:8080
+  OIDC_IDP_URL: http://local.todo-list.com/auth/realms/todo-list
+  OIDC_REDIRECT_URL: http://local.todo-list.com/website/oidc/callback
+  OIDC_CLIENT_ID: application
+  OIDC_CLIENT_SECRET: b047cc08-f324-4bd4-a7fa-31d8ddbc08e6
+  context_path: /website
+  todo.base-url: http://todo-service.todo-service.svc.cluster.local:8080
 ---
 
 apiVersion: apps/v1

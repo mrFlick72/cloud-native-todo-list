@@ -123,7 +123,10 @@ func oidcCallbackHandlerFactory(oauth2Config *oauth2.Config, verifier *oidc.IDTo
 			return
 		}
 
+		claims := claimsFor(idToken)
+
 		session.Set("oidcUser", OidcUser{
+			UserName:     claims["preferred_username"],
 			AccessToken:  oauth2Token.AccessToken,
 			RefreshToken: oauth2Token.RefreshToken,
 			IdToken:      rawIDToken,
@@ -134,11 +137,18 @@ func oidcCallbackHandlerFactory(oauth2Config *oauth2.Config, verifier *oidc.IDTo
 	}
 }
 
+func claimsFor(idToken *oidc.IDToken) map[string]string {
+	claims := make(map[string]string)
+	idToken.Claims(&claims)
+	return claims
+}
+
 func stateFactory() string {
 	return uuid.NewString()
 }
 
 type OidcUser struct {
+	UserName     string
 	AccessToken  string
 	RefreshToken string
 	IdToken      string
@@ -148,4 +158,9 @@ type OidcUser struct {
 
 func (user *OidcUser) IsExpired() bool {
 	return time.Now().After(user.Expire)
+}
+
+func GetUserFromSession(context iris.Context) OidcUser {
+	session := sessions.Get(context)
+	return session.Get("oidcUser").(OidcUser)
 }
