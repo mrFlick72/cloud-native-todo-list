@@ -10,27 +10,34 @@ import (
 	"github.com/kataras/iris/v12/sessions"
 	"golang.org/x/oauth2"
 	"net/http"
+	"net/url"
+	"os"
 )
+
+func redirectUrlPath() string {
+	parse, _ := url.Parse(os.Getenv("OIDC_REDIRECT_URL"))
+	return parse.Path
+}
 
 func SetUpOIDC(app *iris.Application) {
 	oauth2Config, verifier := oidcConfigurer()
 	var middleware = NewOidcMiddleware(oauth2Config)
 	app.Use(middleware)
 	callback := oidcCallbackHandlerFactory(oauth2Config, verifier)
-	app.Get("/demo/callback", callback)
+	app.Get(redirectUrlPath(), callback)
 }
 
 func oidcConfigurer() (*oauth2.Config, *oidc.IDTokenVerifier) {
-	configURL := "http://local.todo-list.com/auth/realms/todo-list"
+	configURL := os.Getenv("OIDC_IDP_URL")
 	ctx := context.Background()
 	provider, err := oidc.NewProvider(ctx, configURL)
 	if err != nil {
 		panic(err)
 	}
 
-	clientID := "application"
-	clientSecret := "b047cc08-f324-4bd4-a7fa-31d8ddbc08e6"
-	redirectURL := "http://localhost:8080/demo/callback"
+	clientID := os.Getenv("OIDC_CLIENT_ID")
+	clientSecret := os.Getenv("OIDC_CLIENT_SECRET")
+	redirectURL := os.Getenv("OIDC_REDIRECT_URL")
 
 	// Configure an OpenID Connect aware OAuth2 client.
 	oauth2Config := &oauth2.Config{
@@ -54,13 +61,13 @@ func NewOidcMiddleware(oauth2Config *oauth2.Config) func(ctx iris.Context) {
 	return func(ctx iris.Context) {
 		session := sessions.Get(ctx)
 
-		idToken := session.Get("id_token")
-		fmt.Printf("idToken: %v", idToken)
-		if ctx.Path() == "/demo/callback" {
+		oidcUser := session.Get("oidcUser")
+		fmt.Printf("oidcUser: %v", oidcUser)
+		if ctx.Path() == redirectUrlPath() {
 			ctx.Next()
 		}
 
-		if idToken == nil {
+		if oidcUser == nil {
 			state := stateFactory()
 			session := sessions.Get(ctx)
 			session.Set("state", state)
@@ -114,14 +121,28 @@ func oidcCallbackHandlerFactory(oauth2Config *oauth2.Config, verifier *oidc.IDTo
 			ctx.StatusCode(http.StatusInternalServerError)
 			return
 		}
-		data, err := json.MarshalIndent(resp, "", "    ")
 
-		fmt.Println(data)
-		session.Set("id_token", data)
+		session.Set("oidcUser", OidcUser{
+			AccessToken:  oauth2Token.AccessToken,
+			RefreshToken: oauth2Token.RefreshToken,
+			IdToken:      rawIDToken,
+			Authorities:  make([]string, 0),
+		})
 		ctx.Redirect(session.GetString("request_url"))
 	}
 }
 
 func stateFactory() string {
 	return uuid.NewString()
+}
+
+type OidcUser struct {
+	AccessToken  string
+	RefreshToken string
+	IdToken      string
+	Authorities  []string
+}
+
+func (user *OidcUser) IsExpired() bool {
+	return false
 }
