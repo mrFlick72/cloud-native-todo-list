@@ -11,6 +11,7 @@ import (
 	"golang.org/x/oauth2"
 	"net/http"
 	"strings"
+	"time"
 )
 
 func main() {
@@ -21,12 +22,25 @@ func main() {
 	sess := sessions.New(sessions.Config{
 		Cookie:       "go_session_id",
 		AllowReclaim: true,
+		Expires:      time.Second * 10,
 	})
 	app.Use(sess.Handler())
 
 	tmpl := iris.HTML("./views", ".html")
 	app.RegisterView(tmpl)
 	app.Get("/", func(ctx iris.Context) {
+		session := sessions.Get(ctx)
+		ctx.ViewData("session_lifetime", session.Lifetime)
+		ctx.ViewData("session_isNew", session.IsNew())
+		session.Set("username", "a user name")
+		ctx.View("index.html")
+	})
+
+	app.Get("/next", func(ctx iris.Context) {
+		session := sessions.Get(ctx)
+		ctx.ViewData("session_lifetime", session.Lifetime)
+		ctx.ViewData("session_isNew", session.IsNew())
+		ctx.ViewData("username", session.GetString("username"))
 		ctx.View("index.html")
 	})
 
