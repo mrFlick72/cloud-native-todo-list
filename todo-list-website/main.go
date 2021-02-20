@@ -20,8 +20,8 @@ func main() {
 		Expires:      time.Second * 10,
 	})
 	app.Use(sess.Handler())
-	app.Use(oidc.NewOidcMiddleware)
 
+	oidc.SetUpOIDC(app)
 	tmpl := iris.HTML("./views", ".html")
 	app.RegisterView(tmpl)
 
@@ -40,7 +40,6 @@ func main() {
 		ctx.ViewData("username", session.GetString("username"))
 		ctx.View("index.html")
 	})
-	app.Get("/demo/callback", oidc.OidcCallback)
 
 	app.Listen(":8080")
 }
