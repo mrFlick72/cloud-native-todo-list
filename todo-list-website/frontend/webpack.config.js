@@ -1,19 +1,21 @@
 var path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const {CleanWebpackPlugin} = require("clean-webpack-plugin");
 
-const BUID_DIR = path.resolve(__dirname + "/static");
+const BUID_DIR = path.resolve(__dirname + "../../static");
 
 module.exports = {
     mode: 'development',
     entry: {
-        login: path.resolve(__dirname, './index.js')
+        app: path.resolve(__dirname, './index.js')
     },
     resolve: {
         extensions: [".js", ".jsx"]
     },
     plugins: [
+        new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
-            chunks: ['login'],
+            chunks: ['app'],
             filename: "index.html",
             template: path.resolve(__dirname, "index.html")
         })
