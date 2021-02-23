@@ -1,7 +1,7 @@
 var path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const BUID_DIR = path.resolve(__dirname + "../../../../target/classes/static");
+const BUID_DIR = path.resolve(__dirname + "/static");
 
 module.exports = {
     mode: 'development',
@@ -15,7 +15,7 @@ module.exports = {
         new HtmlWebpackPlugin({
             chunks: ['login'],
             filename: "index.html",
-            template: path.resolve(__dirname, "../resources/static/index.html")
+            template: path.resolve(__dirname, "index.html")
         })
     ],
     module: {
