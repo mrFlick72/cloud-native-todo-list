@@ -17,7 +17,8 @@ module.exports = {
         new HtmlWebpackPlugin({
             chunks: ['app'],
             filename: "index.html",
-            template: path.resolve(__dirname, "index.html")
+            title: "Todo-List"
+            // template: path.resolve(__dirname, "index.html")
         })
     ],
     module: {
