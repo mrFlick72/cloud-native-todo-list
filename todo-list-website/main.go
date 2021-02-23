@@ -26,12 +26,6 @@ func main() {
 	app.RegisterView(tmpl)
 
 	app.Get("/index.html", func(ctx iris.Context) {
-		session := sessions.Get(ctx)
-		ctx.ViewData("session_lifetime", session.Lifetime)
-		ctx.ViewData("session_isNew", session.IsNew())
-		session.Set("username", "a user name")
-		ctx.ViewData("oidcUser", session.Get("oidcUser"))
-
 		ctx.View("index.html")
 	})
 
