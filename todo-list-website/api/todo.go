@@ -26,7 +26,7 @@ func SetUpTodoEndpoints(basePath string, serviceUrl string, client *resty.Client
 	})
 
 	app.Post(basePath+"/todo", func(ctx iris.Context) {
-		representation, err := getTodoFromBody(ctx)
+		body, representation, err := getTodoFromBody(ctx)
 		if err != nil {
 			fmt.Println("error: " + err.Error())
 			ctx.StatusCode(http.StatusBadRequest)
@@ -35,9 +35,15 @@ func SetUpTodoEndpoints(basePath string, serviceUrl string, client *resty.Client
 
 		userName := oidc.GetUserFromSession(ctx).UserName
 		representation.UserName = userName
-		response, err := client.R().Post(serviceUrl + "/todo")
+		response, err := client.R().
+			SetHeader("Content-Type", "application/json").
+			SetBody(body).
+			Post(serviceUrl + "/todo")
 
-		if response.IsError() || err != nil {
+		fmt.Printf("body %v\n", body)
+		fmt.Printf("url %v\n", serviceUrl+"/todo")
+		fmt.Printf("response %v\n", response)
+		if err != nil {
 			fmt.Println("error: " + err.Error())
 			ctx.StatusCode(http.StatusInternalServerError)
 		}
@@ -53,10 +59,10 @@ func SetUpTodoEndpoints(basePath string, serviceUrl string, client *resty.Client
 	})
 }
 
-func getTodoFromBody(ctx iris.Context) (TodoRepresentation, error) {
+func getTodoFromBody(ctx iris.Context) ([]byte, *TodoRepresentation, error) {
 	representation := TodoRepresentation{}
 	body, err := ctx.GetBody()
 	err = json.Unmarshal(body, &representation)
 
-	return representation, err
+	return body, &representation, err
 }

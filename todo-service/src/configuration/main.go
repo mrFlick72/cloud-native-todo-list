@@ -12,12 +12,13 @@ import (
 func ServerConfigurer() *echo.Echo {
 	repository := todo.MySqlTodoRepository{ConnectionString: databaseConnectionStringFromEnv()}
 	server := echo.New()
+	contextPath := "/todo-service"
 	endpoint := api.TodoEndpoints{TodoRepository: &repository}
 
-	server.GET("/todo", endpoint.GetTodoEndpoint)
-	server.GET("/todo/:id", endpoint.GetOneTodoEndpoint)
-	server.POST("/todo", endpoint.SaveTodoEndpoint)
-	server.DELETE("/todo/:id", endpoint.DeleteTodoEndpoint)
+	server.GET(contextPath+"/todo", endpoint.GetTodoEndpoint)
+	server.GET(contextPath+"/todo/:id", endpoint.GetOneTodoEndpoint)
+	server.POST(contextPath+"/todo", endpoint.SaveTodoEndpoint)
+	server.DELETE(contextPath+"/todo/:id", endpoint.DeleteTodoEndpoint)
 
 	server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},

@@ -10,7 +10,7 @@ type MySqlTodoRepository struct {
 }
 
 func (repository *MySqlTodoRepository) GetAllTodo(userName string) ([]*Todo, error) {
-	result := []*Todo{}
+	result := make([]*Todo, 0)
 
 	db, err := GetDatabaseConnectionFor(repository)
 
