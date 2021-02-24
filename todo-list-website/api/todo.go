@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"githab/mrflick72/cloud-native-todo-list/todo-list-website/middleware/security/oidc"
 	"github.com/go-resty/resty/v2"
 	"github.com/kataras/iris/v12"
@@ -27,6 +28,7 @@ func SetUpTodoEndpoints(basePath string, serviceUrl string, client *resty.Client
 	app.Post(basePath+"/todo", func(ctx iris.Context) {
 		representation, err := getTodoFromBody(ctx)
 		if err != nil {
+			fmt.Println("error: " + err.Error())
 			ctx.StatusCode(http.StatusBadRequest)
 			return
 		}
@@ -36,6 +38,7 @@ func SetUpTodoEndpoints(basePath string, serviceUrl string, client *resty.Client
 		response, err := client.R().Post(serviceUrl + "/todo")
 
 		if response.IsError() || err != nil {
+			fmt.Println("error: " + err.Error())
 			ctx.StatusCode(http.StatusInternalServerError)
 		}
 	})
@@ -44,6 +47,7 @@ func SetUpTodoEndpoints(basePath string, serviceUrl string, client *resty.Client
 		id := ctx.Params().Get("id")
 		response, err := client.R().Delete(serviceUrl + "/todo/" + id)
 		if response.IsError() || err != nil {
+			fmt.Println("error: " + err.Error())
 			ctx.StatusCode(http.StatusInternalServerError)
 		}
 	})

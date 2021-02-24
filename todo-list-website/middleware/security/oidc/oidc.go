@@ -63,7 +63,6 @@ func NewOidcMiddleware(oauth2Config *oauth2.Config) func(ctx iris.Context) {
 		session := sessions.Get(ctx)
 
 		oidcUser := session.Get("oidcUser")
-		fmt.Printf("oidcUser: %v", oidcUser)
 		if ctx.Path() == redirectUrlPath() {
 			ctx.Next()
 		}

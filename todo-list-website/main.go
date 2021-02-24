@@ -32,7 +32,7 @@ func main() {
 	tmpl := iris.HTML("./static", ".html")
 	app.RegisterView(tmpl)
 
-	app.HandleDir(basePath, "./static/website")
+	app.HandleDir(basePath, "./static")
 	app.Get(basePath+"/index.html", func(ctx iris.Context) {
 		ctx.View("index.html")
 	})
