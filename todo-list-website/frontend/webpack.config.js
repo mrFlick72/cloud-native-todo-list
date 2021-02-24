@@ -41,7 +41,7 @@ module.exports = {
         ]
     },
     output: {
-        filename: 'website/[name]_bundle.js',
+        filename: '/website/[name]_bundle.js',
         path: BUID_DIR
     }
 };
