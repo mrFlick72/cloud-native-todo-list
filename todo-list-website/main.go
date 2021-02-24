@@ -16,6 +16,7 @@ import (
 func main() {
 	basePath := os.Getenv("BASE_PATH")
 	todoServiceBaseUrl := os.Getenv("TODO_SERVICE_BASE_URL")
+	sessionLifeTime, _ := time.ParseDuration(os.Getenv("SESSION_LIFE_TIME"))
 
 	app := iris.New()
 	app.Use(recover.New())
@@ -24,7 +25,7 @@ func main() {
 	sess := sessions.New(sessions.Config{
 		Cookie:       "go_session_id",
 		AllowReclaim: true,
-		Expires:      time.Second * 10,
+		Expires:      sessionLifeTime,
 	})
 	app.Use(sess.Handler())
 

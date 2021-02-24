@@ -54,7 +54,8 @@ data:
   OIDC_CLIENT_ID: application
   OIDC_CLIENT_SECRET: b047cc08-f324-4bd4-a7fa-31d8ddbc08e6
   BASE_PATH: /website
-  TODO_SERVICE_BASE_URL: http://todo-service.todo-service.svc.cluster.local:8080
+  TODO_SERVICE_BASE_URL: http://todo-service.todo-service.svc.cluster.local:8080/todo-service
+  SESSION_LIFE_TIME: 1h
 ---
 
 apiVersion: apps/v1

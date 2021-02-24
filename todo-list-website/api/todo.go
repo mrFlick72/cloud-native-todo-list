@@ -5,15 +5,16 @@ import (
 	"fmt"
 	"githab/mrflick72/cloud-native-todo-list/todo-list-website/middleware/security/oidc"
 	"github.com/go-resty/resty/v2"
+	"github.com/google/uuid"
 	"github.com/kataras/iris/v12"
 	"net/http"
 )
 
 type TodoRepresentation struct {
-	Id       string
-	Date     string
-	UserName string
-	Content  string
+	Id       string `json:"id"`
+	UserName string `json:"userName"`
+	Date     string `json:"date"`
+	Content  string `json:"content"`
 }
 
 func SetUpTodoEndpoints(basePath string, serviceUrl string, client *resty.Client, app *iris.Application) {
@@ -33,8 +34,8 @@ func SetUpTodoEndpoints(basePath string, serviceUrl string, client *resty.Client
 			return
 		}
 
-		userName := oidc.GetUserFromSession(ctx).UserName
-		representation.UserName = userName
+		fmt.Printf("representation: %v\n", representation)
+
 		response, err := client.R().
 			SetHeader("Content-Type", "application/json").
 			SetBody(body).
@@ -43,9 +44,12 @@ func SetUpTodoEndpoints(basePath string, serviceUrl string, client *resty.Client
 		fmt.Printf("body %v\n", body)
 		fmt.Printf("url %v\n", serviceUrl+"/todo")
 		fmt.Printf("response %v\n", response)
+		fmt.Printf("response status %v\n", response.Status())
 		if err != nil {
 			fmt.Println("error: " + err.Error())
 			ctx.StatusCode(http.StatusInternalServerError)
+		} else {
+			ctx.StatusCode(http.StatusCreated)
 		}
 	})
 
@@ -55,14 +59,23 @@ func SetUpTodoEndpoints(basePath string, serviceUrl string, client *resty.Client
 		if response.IsError() || err != nil {
 			fmt.Println("error: " + err.Error())
 			ctx.StatusCode(http.StatusInternalServerError)
+		} else {
+			ctx.StatusCode(http.StatusNoContent)
 		}
 	})
 }
 
-func getTodoFromBody(ctx iris.Context) ([]byte, *TodoRepresentation, error) {
-	representation := TodoRepresentation{}
+func getTodoFromBody(ctx iris.Context) (string, *TodoRepresentation, error) {
+	userName := oidc.GetUserFromSession(ctx).UserName
+
+	representation := TodoRepresentation{UserName: userName}
 	body, err := ctx.GetBody()
 	err = json.Unmarshal(body, &representation)
 
-	return body, &representation, err
+	if representation.Id == "" {
+		representation.Id = uuid.New().String()
+	}
+	marshal, err := json.Marshal(&representation)
+
+	return string(marshal), &representation, err
 }
