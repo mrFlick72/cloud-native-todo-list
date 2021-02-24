@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"githab/mrflick72/cloud-native-todo-list/todo-list-website/middleware/security/oidc"
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/middleware/logger"
@@ -22,12 +23,13 @@ func main() {
 	app.Use(sess.Handler())
 
 	oidc.SetUpOIDC(app)
-	tmpl := iris.HTML("./views", ".html")
+	tmpl := iris.HTML("./static", ".html")
 	app.RegisterView(tmpl)
 
+	app.HandleDir("/website", "./static/website")
 	app.Get("/index.html", func(ctx iris.Context) {
 		ctx.View("index.html")
 	})
 
-	app.Listen(":8080")
+	fmt.Println(app.Listen(":8080"))
 }
