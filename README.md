@@ -30,6 +30,9 @@ while for build  todo-service folder and fire the follow command ```docker build
  
 keep in mind that all the command should run in the same shell in which the command ```eval $(minikube --profile istio docker-env) ``` is executed
 
+Another thing to do is add the minikube ip linked to the local.todo-list.com dns name in your hosts file. In order to 
+gain the correct minikube ip you can use the follow command ```minikube ip -p istio```
+
 ## inject envoy proxy for istio
 in order to deploy all k8s yaml instrumented by istio execute the follow commands
 PAY ATTENTION!!! in todo-list-website.yml there is a ${MINIKUBE_IP} placeholder this have to replaced with ```minikube ip --profile istio``` value
@@ -62,4 +65,4 @@ That's all?......... no it is only the surface stay tuned soon other improvement
 ![](images/kiali_2.png)
 
 ### jeager dashboard!
-[](images/jeager.png)
+![](images/jeager.png)
