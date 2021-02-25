@@ -55,3 +55,11 @@ and automatically you can start to explore:
 Istio is a super powerful platform that can help you to manage your service mesh, in kubernetes or bare metal in a consistent way. 
 That's all?......... no it is only the surface stay tuned soon other improvement and example of how leverage of Istio feature will come!
  
+## contents
+
+### kiali dashboard
+![](images/kiali_1.png)
+![](images/kiali_2.png)
+
+### jeager dashboard!
+[](images/jeager.png)
