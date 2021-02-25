@@ -64,5 +64,5 @@ and automatically you can start to explore:
 
 ## Conclusion
 Istio is a super powerful platform that can help you to manage your service mesh, in kubernetes or bare metal in a consistent way. 
-Thats all?......... no it is only the surface stay tuned soon other improvement and example of how leverage of Istio feature will come!
+That's all?......... no it is only the surface stay tuned soon other improvement and example of how leverage of Istio feature will come!
  
