@@ -1,5 +1,5 @@
 build:
-	rm static; \
+	rm -rf static; \
 	cd frontend; \
 	npm install; \
 	npm run-script build; \
